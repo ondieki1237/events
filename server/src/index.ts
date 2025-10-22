@@ -9,6 +9,7 @@ import authRoutes from './routes/auth'
 import interestsRoutes from './routes/interests'
 import feedbackRoutes from './routes/feedbacks'
 import statsRoutes from './routes/stats'
+import productsRoutes from './routes/products'
 
 dotenv.config({ path: './.env' })
 
@@ -40,6 +41,7 @@ app.use('/api/auth', authRoutes)
 app.use('/api/interests', interestsRoutes)
 app.use('/api/feedbacks', feedbackRoutes)
 app.use('/api/stats', statsRoutes)
+app.use('/api/products', productsRoutes)
 
 app.get('/', (req, res) => res.json({ ok: true, name: 'Events backend' }))
 
