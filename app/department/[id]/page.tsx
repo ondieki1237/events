@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -77,6 +77,45 @@ export default function DepartmentPage({ params }: { params: { id: string } }) {
   const deptId = Number.parseInt(params.id)
   const dept = departmentData[deptId]
   const [selectedProducts, setSelectedProducts] = useState<number[]>([])
+  const [products, setProducts] = useState<Array<{ id: number; name: string; description?: string; image_url?: string }>>(dept?.products ?? [])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    let mounted = true
+
+    async function load() {
+      setLoading(true)
+      setError(null)
+
+      const apiBase = (process.env.NEXT_PUBLIC_PRODUCTS_API as string) || 'http://localhost:5000/api/products'
+
+      try {
+        const res = await fetch(apiBase)
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        const json = await res.json()
+        // server returns { data: rows }
+        const items = (json?.data ?? json) as any[]
+
+        if (!mounted) return
+
+        const mapped = items.map((r) => ({ id: Number(r.ID ?? r.id ?? r.ID), name: r.product_name ?? r.product_name ?? r.post_title ?? r.name, description: r.description ?? '', image_url: r.image_url ?? r.guid ?? r.image_url }))
+        setProducts(mapped)
+      } catch (err: any) {
+        console.warn('Failed to fetch products, falling back to static list', err)
+        setError('Failed to load products')
+        // keep existing dept products as fallback
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    load()
+
+    return () => {
+      mounted = false
+    }
+  }, [deptId])
 
   if (!dept) {
     return (
@@ -121,7 +160,10 @@ export default function DepartmentPage({ params }: { params: { id: string } }) {
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold mb-12 text-foreground">Our Products</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-            {dept.products.map((product) => (
+            {loading && <div>Loading products...</div>}
+            {error && <div className="text-red-600">{error}</div>}
+            {!loading && products.length === 0 && <div>No products found</div>}
+            {products.map((product) => (
               <Card
                 key={product.id}
                 className="p-6 cursor-pointer transition-all duration-300 border-2"

@@ -1,4 +1,4 @@
-import { Facebook, Twitter, Video } from 'lucide-react'
+import { Facebook, Twitter } from 'lucide-react'
 
 export default function Footer() {
   return (
@@ -76,7 +76,10 @@ export default function Footer() {
                     className="text-muted-foreground hover:text-primary transition-colors"
                     aria-label="TikTok"
                   >
-                    <Video className="h-5 w-5" />
+                    {/* Inline TikTok SVG (monochrome) */}
+                    <svg className="h-5 w-5" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M170.7 40.3c-2.6-.4-5.1-.6-7.8-.6-6.1 0-11.9 1.2-17.3 3.4v68.5c0 27.8-22.6 50.4-50.4 50.4-27.8 0-50.4-22.6-50.4-50.4S67.4 61.2 95.2 61.2c6 0 11.8 1 17.2 2.8V41.6c-10.4-4.4-22.1-6.9-34.2-6.9C42 34.7 21 55.7 21 81.9c0 26.2 21 47.2 47.2 47.2 26.2 0 47.2-21 47.2-47.2V43.1c6.5-1.8 13.3-2.8 20.3-2.8 6.3 0 12.4 1 18.2 2.8v79.8c0 37.6-30.6 68.2-68.2 68.2S26 160.5 26 122.9 56.6 54.7 94.2 54.7c12.8 0 24.8 3.4 35.1 9.4V40.3h41.4v0z" />
+                    </svg>
                   </a>
                 </div>
               </div>
