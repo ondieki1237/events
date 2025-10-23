@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
+import OfficeMap from "@/components/office-map"
+import TopRatedProducts from './components/top-rated-products'
 
 const departments = [
   {
@@ -193,7 +195,7 @@ export default function Home() {
                       <span className="text-2xl">{dept.icon}</span>
                     </div>
                   </div>
-                  <div className="p-6 bg-background">
+                  <div className="p-6">
                     <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-neu">
                       {dept.name}
                     </h3>
@@ -210,7 +212,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CTA Section */}
+  {/* Top Rated Products (most viewed/searched) */}
+  <TopRatedProducts />
+
+  {/* CTA Section */}
       <section className="py-24 px-4 md:px-8 lg:px-12 bg-gradient-to-r from-primary via-accent to-primary gradient-animate text-white relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
         <div className="max-w-4xl mx-auto text-center space-y-8 relative z-10">
@@ -234,7 +239,10 @@ export default function Home() {
         </div>
       </section>
 
-      <Footer />
+  {/* Office locations — shown only on the Home page */}
+  <OfficeMap />
+
+  <Footer />
     </div>
   )
 }

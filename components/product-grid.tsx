@@ -2,6 +2,7 @@
 
 import * as React from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -69,10 +70,11 @@ function GridViewProduct({ product, selected, onToggle, showCategory }: {
   const cleanDescription = formatDescription(product.description, 180)
 
   return (
-    <Card className={`
-      overflow-hidden transition-neu group cursor-pointer h-full flex flex-col
-      ${selected ? 'neu-pressed border-2 border-primary/40 ring-2 ring-primary/20' : 'neu-card hover:neu-hover hover:scale-[1.02]'}
-    `}>
+    <Link href={`/product/${product.id}`} className="block h-full">
+      <Card className={`
+        overflow-hidden transition-neu group cursor-pointer h-full flex flex-col
+        ${selected ? 'neu-pressed border-2 border-primary/40 ring-2 ring-primary/20' : 'neu-card hover:neu-hover hover:scale-[1.02]'}
+      `}>
       {/* Image Section */}
       <div className="relative h-56 bg-gradient-to-br from-muted/30 to-muted/50 overflow-hidden">
         {src ? (
@@ -128,7 +130,7 @@ function GridViewProduct({ product, selected, onToggle, showCategory }: {
         <div className="mt-4 pt-4 border-t border-border">
           <Button 
             size="sm" 
-            onClick={(e) => { e.stopPropagation(); onToggle(product.id) }}
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggle(product.id) }}
             className={`
               w-full transition-neu font-semibold
               ${selected 
@@ -151,6 +153,7 @@ function GridViewProduct({ product, selected, onToggle, showCategory }: {
         </div>
       </div>
     </Card>
+    </Link>
   )
 }
 
@@ -165,11 +168,12 @@ function ListViewProduct({ product, selected, onToggle, showCategory }: {
   const cleanDescription = formatDescription(product.description, 250)
 
   return (
-    <Card className={`
-      p-5 cursor-pointer overflow-hidden transition-neu
-      ${selected ? 'neu-pressed border-2 border-primary/30' : 'neu-card hover:neu-hover hover:scale-[1.01]'}
-      group
-    `}>
+    <Link href={`/product/${product.id}`} className="block">
+      <Card className={`
+        p-5 cursor-pointer overflow-hidden transition-neu
+        ${selected ? 'neu-pressed border-2 border-primary/30' : 'neu-card hover:neu-hover hover:scale-[1.01]'}
+        group
+      `}>
       <div className="flex gap-5">
         {/* Image */}
         <div className="w-36 h-36 rounded-xl overflow-hidden flex items-center justify-center neu-card group-hover:neu-hover transition-neu flex-shrink-0 relative">
@@ -225,7 +229,7 @@ function ListViewProduct({ product, selected, onToggle, showCategory }: {
             <Button 
               size="sm" 
               variant={selected ? 'secondary' : 'default'} 
-              onClick={(e) => { e.stopPropagation(); onToggle(product.id) }}
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggle(product.id) }}
               className={`
                 transition-neu font-semibold
                 ${selected 
@@ -240,6 +244,7 @@ function ListViewProduct({ product, selected, onToggle, showCategory }: {
         </div>
       </div>
     </Card>
+    </Link>
   )
 }
 
@@ -254,11 +259,12 @@ function CompactViewProduct({ product, selected, onToggle, showCategory }: {
   const cleanDescription = formatDescription(product.description, 120)
 
   return (
-    <Card className={`
-      p-4 cursor-pointer overflow-hidden transition-neu
-      ${selected ? 'neu-pressed border-2 border-primary/30 bg-primary/5' : 'neu-card hover:neu-hover hover:scale-[1.01]'}
-      group
-    `}>
+    <Link href={`/product/${product.id}`} className="block">
+      <Card className={`
+        p-4 cursor-pointer overflow-hidden transition-neu
+        ${selected ? 'neu-pressed border-2 border-primary/30 bg-primary/5' : 'neu-card hover:neu-hover hover:scale-[1.01]'}
+        group
+      `}>
       <div className="flex gap-4 items-center">
         {/* Compact Image */}
         <div className="w-20 h-20 rounded-lg overflow-hidden flex items-center justify-center flex-shrink-0 relative bg-gradient-to-br from-muted/30 to-muted/50">
@@ -308,7 +314,7 @@ function CompactViewProduct({ product, selected, onToggle, showCategory }: {
         {/* Action */}
         <Button 
           size="sm" 
-          onClick={(e) => { e.stopPropagation(); onToggle(product.id) }}
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggle(product.id) }}
           className={`
             transition-neu font-semibold flex-shrink-0 text-xs px-4
             ${selected 
@@ -321,6 +327,7 @@ function CompactViewProduct({ product, selected, onToggle, showCategory }: {
         </Button>
       </div>
     </Card>
+    </Link>
   )
 }
 

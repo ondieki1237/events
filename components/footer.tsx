@@ -5,7 +5,7 @@ export default function Footer() {
     <footer className="bg-gradient-to-b from-foreground to-foreground/95 text-background py-16 px-4 md:px-8 lg:px-12 relative overflow-hidden">
       <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-5" />
       <div className="max-w-6xl mx-auto relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12 mt-6">
           <div className="fade-in-up">
             <h3 className="font-bold mb-4 text-xl">Accord Medical</h3>
             <p className="text-sm opacity-80 leading-relaxed">
