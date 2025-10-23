@@ -66,6 +66,7 @@ export default function ProductDetailPage() {
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [views, setViews] = useState<number | null>(null)
 
   useEffect(() => {
     async function fetchProduct() {
@@ -165,6 +166,22 @@ export default function ProductDetailPage() {
 
     if (productId) {
       fetchProduct()
+      // increment view count (fire-and-forget)
+      ;(async () => {
+        try {
+          const res = await fetch(`/api/products/views`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: productId })
+          })
+          if (res.ok) {
+            const json = await res.json()
+            setViews(Number(json?.views ?? json?.data?.views ?? null))
+          }
+        } catch (e) {
+          // ignore
+        }
+      })()
     }
   }, [productId])
 
@@ -307,6 +324,11 @@ export default function ProductDetailPage() {
                 <Badge variant="secondary" className="text-sm px-4 py-1.5 font-semibold">
                   {product.category}
                 </Badge>
+              )}
+              {views !== null && (
+                <div className="text-sm text-muted-foreground mt-2">
+                  Views: <strong className="text-foreground">{views}</strong>
+                </div>
               )}
               
               <div>
