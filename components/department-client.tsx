@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import Navbar from '@/components/navbar'
 import Footer from '@/components/footer'
-import ProductCard from '@/components/product-card'
+import ProductGrid from '@/components/product-grid'
 
 // Map department IDs to category names from the API
 const departmentMapping: Record<number, { name: string; description: string }> = {
@@ -68,6 +68,7 @@ export default function DepartmentClient({ deptId }: { deptId: number }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [query, setQuery] = useState('')
+  const [viewMode, setViewMode] = useState<'grid' | 'list' | 'compact'>('grid')
 
   useEffect(() => {
     let mounted = true
@@ -184,13 +185,66 @@ export default function DepartmentClient({ deptId }: { deptId: number }) {
             </div>
           )}
 
-          <div className="mb-8 fade-in-up stagger-1">
+          <div className="mb-8 fade-in-up stagger-1 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
             <input 
               value={query} 
               onChange={(e) => setQuery(e.target.value)} 
               placeholder="Search products..." 
-              className="w-full max-w-md px-5 py-3 rounded-xl border-0 bg-background neu-card focus:neu-hover transition-neu text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/20" 
+              className="w-full sm:max-w-md px-5 py-3 rounded-xl border-0 bg-background neu-card focus:neu-hover transition-neu text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/20" 
             />
+            
+            {/* View Mode Toggle */}
+            <div className="flex gap-2 neu-card rounded-xl p-1 bg-background">
+              <button
+                onClick={() => setViewMode('grid')}
+                className={`px-4 py-2 rounded-lg transition-neu font-medium text-sm ${
+                  viewMode === 'grid' 
+                    ? 'bg-gradient-to-r from-primary to-accent text-white neu-pressed' 
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                }`}
+                title="Grid View"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="inline">
+                  <rect x="3" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="14" width="7" height="7"></rect>
+                  <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`px-4 py-2 rounded-lg transition-neu font-medium text-sm ${
+                  viewMode === 'list' 
+                    ? 'bg-gradient-to-r from-primary to-accent text-white neu-pressed' 
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                }`}
+                title="List View"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="inline">
+                  <line x1="8" y1="6" x2="21" y2="6"></line>
+                  <line x1="8" y1="12" x2="21" y2="12"></line>
+                  <line x1="8" y1="18" x2="21" y2="18"></line>
+                  <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                  <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                  <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                </svg>
+              </button>
+              <button
+                onClick={() => setViewMode('compact')}
+                className={`px-4 py-2 rounded-lg transition-neu font-medium text-sm ${
+                  viewMode === 'compact' 
+                    ? 'bg-gradient-to-r from-primary to-accent text-white neu-pressed' 
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                }`}
+                title="Compact View"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="inline">
+                  <line x1="3" y1="12" x2="21" y2="12"></line>
+                  <line x1="3" y1="6" x2="21" y2="6"></line>
+                  <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+              </button>
+            </div>
           </div>
 
           {currentCategory && (() => {
@@ -202,32 +256,54 @@ export default function DepartmentClient({ deptId }: { deptId: number }) {
               return name.includes(q) || desc.includes(q)
             })
 
-            if (filtered.length === 0) return null
+            if (filtered.length === 0) return (
+              <div className="text-center py-20 neu-card rounded-2xl">
+                <div className="text-6xl mb-4">🔍</div>
+                <h3 className="text-xl font-bold text-foreground mb-2">No products found</h3>
+                <p className="text-muted-foreground">Try adjusting your search query</p>
+              </div>
+            )
 
               const currentVisible = visibleCounts[currentCategory.name] || 10
               const visible = filtered.slice(0, currentVisible)
               const hasMore = filtered.length > currentVisible
+              
+              // Map products to the format expected by ProductGrid
+              const mappedProducts = visible.map((p: any) => ({
+                id: Number(p.id ?? p.ID),
+                name: p.name ?? p.product_name ?? p.post_title,
+                description: p.description ?? p.short_description ?? p.description,
+                image_url: p.image_url ?? p.image ?? p.guid ?? null,
+                category: currentCategory.name,
+                price: p.price
+              }))
 
               return (
                 <section className="mb-12 fade-in-up">
-                  <h3 className="text-3xl font-bold mb-6 text-foreground bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                    {currentCategory.name}
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {visible.map((p: any) => (
-                      <div key={p.id ?? p.ID} onClick={() => handleProductSelect(Number(p.id ?? p.ID))}>
-                        <ProductCard product={{ id: Number(p.id ?? p.ID), name: p.name ?? p.product_name ?? p.post_title, description: p.description ?? p.short_description ?? p.description, image_url: p.image_url ?? p.image ?? p.guid ?? null, price: p.price }} selected={selectedProducts.includes(Number(p.id ?? p.ID))} onToggle={(id) => handleProductSelect(id)} />
-                      </div>
-                    ))}
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-3xl font-bold text-foreground bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                      {currentCategory.name}
+                    </h3>
+                    <span className="text-sm text-muted-foreground font-medium">
+                      Showing {visible.length} of {filtered.length} products
+                    </span>
                   </div>
+                  
+                  <ProductGrid 
+                    products={mappedProducts}
+                    selectedProducts={selectedProducts}
+                    onToggle={handleProductSelect}
+                    viewMode={viewMode}
+                    showCategory={false}
+                  />
 
                   {hasMore && (
                     <div className="mt-8 text-center">
                       <button 
-                        className="px-6 py-3 rounded-xl bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20 text-primary font-bold neu-card hover:neu-hover transition-neu hover:scale-105"
+                        className="px-8 py-4 rounded-xl bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20 text-primary font-bold neu-card hover:neu-hover transition-neu hover:scale-105"
                         onClick={() => setVisibleCounts((prev) => ({ ...prev, [currentCategory.name]: currentVisible + 6 }))}
                       >
-                        View {Math.min(6, filtered.length - currentVisible)} more products →
+                        Load {Math.min(6, filtered.length - currentVisible)} more products →
                       </button>
                     </div>
                   )}
