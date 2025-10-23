@@ -62,8 +62,9 @@ const departmentMapping: Record<number, { name: string; description: string }> =
 export default function DepartmentClient({ deptId }: { deptId: number }) {
   const dept = departmentMapping[deptId]
   const [selectedProducts, setSelectedProducts] = useState<number[]>([])
-  const [categories, setCategories] = useState<Array<{ id?: number; name: string; products: any[] }>>([])
-  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({})
+  const [currentCategory, setCurrentCategory] = useState<{ id?: number; name: string; products: any[] } | null>(null)
+  const [allCategories, setAllCategories] = useState<Array<{ id?: number; name: string; products: any[] }>>([])
+  const [visibleCounts, setVisibleCounts] = useState<Record<string, number>>({})
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [query, setQuery] = useState('')
@@ -75,7 +76,7 @@ export default function DepartmentClient({ deptId }: { deptId: number }) {
       setLoading(true)
       setError(null)
 
-      const apiBase = (process.env.NEXT_PUBLIC_PRODUCTS_API as string) || 'http://localhost:5000/api/products'
+      const apiBase = (process.env.NEXT_PUBLIC_PRODUCTS_API as string) || 'http://localhost:5500/api/products'
 
       try {
         const res = await fetch(apiBase)
@@ -96,12 +97,16 @@ export default function DepartmentClient({ deptId }: { deptId: number }) {
         }
 
         const preferredIndex = groups.findIndex((g) => dept && g.name && g.name.toString().toLowerCase().includes(dept.name.toLowerCase()))
-        if (preferredIndex > 0) {
-          const [pref] = groups.splice(preferredIndex, 1)
-          groups.unshift(pref)
+        
+        // Store all categories for carousel
+        setAllCategories(groups)
+        
+        // Set only the current department's category for main display
+        if (preferredIndex >= 0) {
+          setCurrentCategory(groups[preferredIndex])
+        } else {
+          setCurrentCategory(groups[0] || null)
         }
-
-        setCategories(groups)
       } catch (err) {
         console.warn('Failed to fetch products, falling back to static list', err)
         setError('Failed to load products')
@@ -188,8 +193,8 @@ export default function DepartmentClient({ deptId }: { deptId: number }) {
             />
           </div>
 
-          {categories.map((group, groupIdx) => {
-              const filtered = group.products.filter((p: any) => {
+          {currentCategory && (() => {
+              const filtered = currentCategory.products.filter((p: any) => {
               const name = (p.name ?? p.product_name ?? p.post_title ?? '').toString().toLowerCase()
               const desc = (p.description ?? p.short_description ?? '').toString().toLowerCase()
               const q = query.trim().toLowerCase()
@@ -199,13 +204,14 @@ export default function DepartmentClient({ deptId }: { deptId: number }) {
 
             if (filtered.length === 0) return null
 
-              const showAll = !!expandedGroups[group.name]
-              const visible = showAll ? filtered : filtered.slice(0, 20)
+              const currentVisible = visibleCounts[currentCategory.name] || 10
+              const visible = filtered.slice(0, currentVisible)
+              const hasMore = filtered.length > currentVisible
 
               return (
-                <section key={group.name} className={`mb-12 fade-in-up stagger-${(groupIdx % 6) + 1}`}>
+                <section className="mb-12 fade-in-up">
                   <h3 className="text-3xl font-bold mb-6 text-foreground bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                    {group.name}
+                    {currentCategory.name}
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {visible.map((p: any) => (
@@ -215,52 +221,97 @@ export default function DepartmentClient({ deptId }: { deptId: number }) {
                     ))}
                   </div>
 
-                  {!showAll && filtered.length > 20 && (
+                  {hasMore && (
                     <div className="mt-8 text-center">
                       <button 
                         className="px-6 py-3 rounded-xl bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20 text-primary font-bold neu-card hover:neu-hover transition-neu hover:scale-105"
-                        onClick={() => setExpandedGroups((s) => ({ ...s, [group.name]: true }))}
+                        onClick={() => setVisibleCounts((prev) => ({ ...prev, [currentCategory.name]: currentVisible + 6 }))}
                       >
-                        View {filtered.length - 20} more products →
+                        View {Math.min(6, filtered.length - currentVisible)} more products →
                       </button>
                     </div>
                   )}
                 </section>
               )
-          })}
+          })()}
 
-            {/* Suggestions: pick up to 6 items from other groups */}
-            {categories.length > 0 && (
-              <section className="mt-16 pt-16 border-t border-border">
-                <h3 className="text-3xl font-bold mb-8 text-center fade-in-up">
-                  <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                    You might also be interested in
-                  </span>
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Horizontal Carousel: Products from 3 random other departments */}
+          {allCategories.length > 1 && (
+            <section className="mt-16 pt-16 border-t border-border">
+              <h3 className="text-3xl font-bold mb-8 text-center fade-in-up">
+                <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                  Explore Other Departments
+                </span>
+              </h3>
+              <div className="overflow-x-auto pb-4 -mx-4 px-4">
+                <div className="flex gap-6 min-w-min">
                   {(() => {
-                    const suggestions: any[] = []
-                    for (const g of categories) {
-                      if (g.products && g.products.length) {
-                        for (const p of g.products) {
-                          // skip products already shown in the first group's main listing
-                          if (suggestions.length >= 6) break
-                          suggestions.push(p)
-                        }
-                      }
-                      if (suggestions.length >= 6) break
-                    }
-                    return suggestions.slice(0, 6).map((p: any, idx: number) => (
-                      <div key={p.id ?? p.ID} onClick={() => handleProductSelect(Number(p.id ?? p.ID))} className={`fade-in-up stagger-${(idx % 6) + 1}`}>
-                        <ProductCard product={{ id: Number(p.id ?? p.ID), name: p.name ?? p.product_name ?? p.post_title, description: p.description ?? p.short_description ?? p.description, image_url: p.image_url ?? p.image ?? p.guid ?? null, price: p.price }} selected={selectedProducts.includes(Number(p.id ?? p.ID))} onToggle={(id) => handleProductSelect(id)} />
-                      </div>
-                    ))
+                    // Get 3 random other departments
+                    const otherDepartments = allCategories.filter((g: any) => g.name !== dept?.name)
+                    const shuffled = otherDepartments.sort(() => 0.5 - Math.random())
+                    const selectedDepts = shuffled.slice(0, 3)
+                    
+                    return selectedDepts.map((category: any, deptIdx: number) => {
+                      // Get 4 random products from each department
+                      const deptProducts = category.products.sort(() => 0.5 - Math.random()).slice(0, 4)
+                      
+                      return (
+                        <div key={category.name} className="flex-shrink-0 w-full md:w-[calc(33.333%-1rem)] fade-in-up">
+                          <div className="neu-card rounded-2xl p-6 bg-background h-full">
+                            <div className="flex items-center justify-between mb-6">
+                              <h4 className="text-xl font-bold text-foreground">{category.name}</h4>
+                              <Link href={`/department/${category.id}`}>
+                                <Button size="sm" variant="outline" className="text-xs neu-card hover:neu-hover">
+                                  View All →
+                                </Button>
+                              </Link>
+                            </div>
+                            <div className="space-y-4">
+                              {deptProducts.map((p: any) => (
+                                <div 
+                                  key={p.id ?? p.ID} 
+                                  className="flex gap-3 p-3 rounded-xl neu-card hover:neu-hover transition-neu cursor-pointer group"
+                                  onClick={() => handleProductSelect(Number(p.id ?? p.ID))}
+                                >
+                                  <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-muted">
+                                    {(p.image_url || p.image) ? (
+                                      // eslint-disable-next-line @next/next/no-img-element
+                                      <img 
+                                        src={p.image_url ?? p.image} 
+                                        alt={p.name ?? p.product_name} 
+                                        className="w-full h-full object-cover transition-smooth group-hover:scale-110" 
+                                      />
+                                    ) : (
+                                      <div className="w-full h-full bg-gradient-to-br from-muted/80 to-muted/60 flex items-center justify-center">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="opacity-40">
+                                          <rect width="24" height="24" rx="4" fill="#E5E7EB" />
+                                          <path d="M7 14l3-4 2 3 3-4 3 5H7z" fill="#9CA3AF" />
+                                        </svg>
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <h5 className="text-sm font-bold text-foreground group-hover:text-primary transition-neu line-clamp-2 mb-1">
+                                      {p.name ?? p.product_name ?? p.post_title}
+                                    </h5>
+                                    {(p.type ?? p.product_type) && (
+                                      <p className="text-xs text-muted-foreground line-clamp-1">
+                                        {p.type ?? p.product_type}
+                                      </p>
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    })
                   })()}
                 </div>
-              </section>
-            )}
-
-            {selectedProducts.length > 0 && (
+              </div>
+            </section>
+          )}            {selectedProducts.length > 0 && (
             <div className="mt-12 bg-gradient-to-r from-primary/10 to-accent/10 p-8 rounded-2xl border border-primary/20 neu-card fade-in-up">
               <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                 <div>

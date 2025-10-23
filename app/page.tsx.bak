@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import Navbar from "@/components/navbar"
@@ -14,7 +13,6 @@ const departments = [
     name: "Laboratory Equipment",
     description: "Advanced diagnostic and testing equipment",
     icon: "🔬",
-    image: "/productlist/laboratory.png",
     color: "from-blue-50 to-blue-100",
   },
   {
@@ -22,7 +20,6 @@ const departments = [
     name: "Maternity Equipment",
     description: "Comprehensive maternal and neonatal care solutions",
     icon: "👶",
-    image: "/productlist/maternity.jpeg",
     color: "from-pink-50 to-pink-100",
   },
   {
@@ -30,7 +27,6 @@ const departments = [
     name: "Diagnostic Products",
     description: "Essential diagnostic tools and supplies",
     icon: "🩺",
-    image: "/productlist/diagnostic.png",
     color: "from-purple-50 to-purple-100",
   },
   {
@@ -38,7 +34,6 @@ const departments = [
     name: "Imaging Equipment",
     description: "Modern imaging and diagnostic technology",
     icon: "📊",
-    image: "/productlist/imaging.png",
     color: "from-cyan-50 to-cyan-100",
   },
   {
@@ -46,7 +41,6 @@ const departments = [
     name: "Theatre & Intensive Care Unit (ICU) Equipment",
     description: "Critical care and surgical equipment",
     icon: "🏥",
-    image: "/productlist/theatre.png",
     color: "from-red-50 to-red-100",
   },
   {
@@ -54,7 +48,6 @@ const departments = [
     name: "Hospital Furniture",
     description: "Quality healthcare furniture solutions",
     icon: "🛏️",
-    image: "/productlist/furniture.jpeg",
     color: "from-green-50 to-green-100",
   },
   {
@@ -62,7 +55,6 @@ const departments = [
     name: "Renal Equipment",
     description: "Dialysis and kidney care equipment",
     icon: "💧",
-    image: "/productlist/renal.jpeg",
     color: "from-teal-50 to-teal-100",
   },
   {
@@ -70,7 +62,6 @@ const departments = [
     name: "Dental Equipment",
     description: "Complete dental care solutions",
     icon: "🦷",
-    image: "/productlist/dental.jpeg",
     color: "from-emerald-50 to-emerald-100",
   },
   {
@@ -78,7 +69,6 @@ const departments = [
     name: "Cold Chain",
     description: "Temperature-controlled storage solutions",
     icon: "❄️",
-    image: "/productlist/cold_chain.png",
     color: "from-sky-50 to-sky-100",
   },
   {
@@ -86,7 +76,6 @@ const departments = [
     name: "CSSD",
     description: "Central Sterile Services Department equipment",
     icon: "🧪",
-    image: "/productlist/cssd.jpeg",
     color: "from-violet-50 to-violet-100",
   },
   {
@@ -94,15 +83,13 @@ const departments = [
     name: "Homecare Equipment",
     description: "Home healthcare and medical equipment",
     icon: "🏠",
-    image: "/productlist/furniture.jpeg",
     color: "from-amber-50 to-amber-100",
   },
   {
     id: 12,
     name: "Medical Training Materials",
     description: "Educational tools and training equipment",
-    icon: "📚",
-    image: "/productlist/training.png",
+    icon: "�",
     color: "from-orange-50 to-orange-100",
   },
 ]
@@ -177,21 +164,9 @@ export default function Home() {
             {departments.map((dept, idx) => (
               <Link key={dept.id} href={`/department/${dept.id}`} className={`fade-in-up stagger-${(idx % 6) + 1}`}>
                 <Card className="h-full transition-neu cursor-pointer border-0 overflow-hidden neu-card hover:neu-hover hover:scale-105 group">
-                  <div className="h-56 bg-gradient-to-br from-muted/30 to-muted/50 relative overflow-hidden">
-                    <Image 
-                      src={dept.image} 
-                      alt={dept.name}
-                      fill
-                      className="object-cover transition-smooth group-hover:scale-110"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    />
-                    {/* Gradient overlay */}
-                    <div className={`absolute inset-0 bg-gradient-to-t ${dept.color} opacity-20 group-hover:opacity-10 transition-neu`} />
-                    
-                    {/* Icon badge */}
-                    <div className="absolute top-4 right-4 w-12 h-12 bg-white/90 backdrop-blur-sm rounded-xl flex items-center justify-center shadow-lg neu-card group-hover:scale-110 transition-smooth">
-                      <span className="text-2xl">{dept.icon}</span>
-                    </div>
+                  <div className={`h-40 bg-gradient-to-br ${dept.color} flex items-center justify-center relative overflow-hidden`}>
+                    <div className="absolute inset-0 bg-white/20 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-neu" />
+                    <span className="text-7xl transition-smooth group-hover:scale-125 relative z-10">{dept.icon}</span>
                   </div>
                   <div className="p-6 bg-background">
                     <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-neu">
