@@ -14,6 +14,7 @@ type Product = {
   image_url?: string
   category?: string
   price?: string | number
+  views?: number
 }
 
 type ViewMode = 'grid' | 'list' | 'compact'
@@ -294,6 +295,11 @@ function CompactViewProduct({ product, selected, onToggle, showCategory }: {
           )}
         </div>
 
+        {typeof product.views === 'number' && (
+          <div className="absolute top-3 left-3 bg-white/90 text-sm px-3 py-1 rounded-full text-foreground font-semibold shadow-sm">
+            👁️ {product.views}
+          </div>
+        )}
         {/* Content */}
         <div className="flex-1 min-w-0">
           <h4 className="text-base font-bold text-foreground group-hover:text-primary transition-neu line-clamp-1 mb-1">
