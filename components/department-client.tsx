@@ -76,7 +76,7 @@ export default function DepartmentClient({ deptId }: { deptId: number }) {
       setLoading(true)
       setError(null)
 
-      const apiBase = (process.env.NEXT_PUBLIC_PRODUCTS_API as string) || 'http://localhost:5500/api/products'
+      const apiBase = (process.env.NEXT_PUBLIC_PRODUCTS_API as string) || 'https://events.codewithseth.co.ke/api/products'
 
       try {
         const res = await fetch(apiBase)
