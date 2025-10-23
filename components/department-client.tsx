@@ -7,74 +7,60 @@ import Navbar from '@/components/navbar'
 import Footer from '@/components/footer'
 import ProductCard from '@/components/product-card'
 
-const departmentData: Record<
-  number,
-  { name: string; description: string; products: Array<{ id: number; name: string; description: string }> }
-> = {
+// Map department IDs to category names from the API
+const departmentMapping: Record<number, { name: string; description: string }> = {
   1: {
     name: 'Laboratory Equipment',
     description: 'Advanced diagnostic and testing equipment for modern laboratories',
-    products: [
-      { id: 1, name: 'Automated Analyzer', description: 'High-throughput automated analysis system' },
-      { id: 2, name: 'Centrifuge System', description: 'Precision centrifugation for sample preparation' },
-      { id: 3, name: 'Microscope Station', description: 'Advanced digital microscopy solution' },
-      { id: 4, name: 'Sample Processor', description: 'Automated sample handling and processing' },
-    ],
   },
   2: {
-    name: 'Surgical Instruments',
-    description: 'Precision surgical tools and equipment for operating rooms',
-    products: [
-      { id: 1, name: 'Surgical Kit Set', description: 'Complete sterile surgical instrument set' },
-      { id: 2, name: 'Electrosurgical Unit', description: 'Advanced electrosurgical cutting and coagulation' },
-      { id: 3, name: 'Surgical Lights', description: 'High-intensity LED surgical lighting' },
-      { id: 4, name: 'Instrument Sterilizer', description: 'Rapid steam sterilization system' },
-    ],
+    name: 'Maternity Equipment',
+    description: 'Comprehensive maternal and neonatal care solutions',
   },
   3: {
-    name: 'Imaging Systems',
-    description: 'Modern imaging and diagnostic technology',
-    products: [
-      { id: 1, name: 'Digital X-Ray', description: 'High-resolution digital radiography system' },
-      { id: 2, name: 'Ultrasound Machine', description: 'Portable ultrasound imaging system' },
-      { id: 3, name: 'CT Scanner', description: 'Advanced computed tomography imaging' },
-      { id: 4, name: 'PACS System', description: 'Picture archiving and communication system' },
-    ],
+    name: 'Diagnostic Products',
+    description: 'Essential diagnostic tools and supplies',
   },
   4: {
-    name: 'Dental Equipment',
-    description: 'Complete dental care solutions',
-    products: [
-      { id: 1, name: 'Dental Chair', description: 'Ergonomic patient dental chair' },
-      { id: 2, name: 'Intraoral Camera', description: 'High-definition intraoral imaging' },
-      { id: 3, name: 'Dental Compressor', description: 'Oil-free dental air compressor' },
-      { id: 4, name: 'Suction System', description: 'Powerful dental suction unit' },
-    ],
+    name: 'Imaging Equipment',
+    description: 'Modern imaging and diagnostic technology',
   },
   5: {
-    name: 'Patient Monitoring',
-    description: 'Real-time patient monitoring systems',
-    products: [
-      { id: 1, name: 'Vital Signs Monitor', description: 'Multi-parameter patient monitor' },
-      { id: 2, name: 'ECG Machine', description: '12-lead electrocardiograph system' },
-      { id: 3, name: 'Pulse Oximeter', description: 'Non-invasive oxygen saturation monitor' },
-      { id: 4, name: 'Blood Pressure Monitor', description: 'Automated blood pressure measurement' },
-    ],
+    name: 'Theatre & Intensive Care Unit (ICU) Equipment',
+    description: 'Critical care and surgical equipment',
   },
   6: {
-    name: 'Sterilization',
-    description: 'Sterilization and infection control solutions',
-    products: [
-      { id: 1, name: 'Autoclave Sterilizer', description: 'High-pressure steam sterilization' },
-      { id: 2, name: 'Dry Heat Sterilizer', description: 'Dry heat sterilization system' },
-      { id: 3, name: 'Disinfection Cabinet', description: 'UV disinfection cabinet' },
-      { id: 4, name: 'Waste Management', description: 'Medical waste disposal system' },
-    ],
+    name: 'Hospital Furniture',
+    description: 'Quality healthcare furniture solutions',
+  },
+  7: {
+    name: 'Renal Equipment',
+    description: 'Dialysis and kidney care equipment',
+  },
+  8: {
+    name: 'Dental Equipment',
+    description: 'Complete dental care solutions',
+  },
+  9: {
+    name: 'Cold Chain',
+    description: 'Temperature-controlled storage solutions',
+  },
+  10: {
+    name: 'CSSD',
+    description: 'Central Sterile Services Department equipment',
+  },
+  11: {
+    name: 'Homecare Equipment',
+    description: 'Home healthcare and medical equipment',
+  },
+  12: {
+    name: 'Medical Training Materials',
+    description: 'Educational tools and training equipment',
   },
 }
 
 export default function DepartmentClient({ deptId }: { deptId: number }) {
-  const dept = departmentData[deptId]
+  const dept = departmentMapping[deptId]
   const [selectedProducts, setSelectedProducts] = useState<number[]>([])
   const [categories, setCategories] = useState<Array<{ id?: number; name: string; products: any[] }>>([])
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({})
@@ -156,28 +142,53 @@ export default function DepartmentClient({ deptId }: { deptId: number }) {
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      <section className="bg-primary text-primary-foreground py-12 px-4 md:px-8 lg:px-12">
-        <div className="max-w-6xl mx-auto">
-          <Link href="/" className="text-primary-foreground/80 hover:text-primary-foreground mb-4 inline-block">
-            ← Back to Departments
+      <section className="relative bg-gradient-to-r from-primary via-accent to-primary gradient-animate text-white py-16 px-4 md:px-8 lg:px-12 overflow-hidden">
+        <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
+        <div className="max-w-6xl mx-auto relative z-10">
+          <Link href="/" className="text-white/90 hover:text-white mb-6 inline-flex items-center gap-2 transition-neu font-medium">
+            <span>←</span> Back to Departments
           </Link>
-          <h1 className="text-4xl font-bold mb-2">{dept.name}</h1>
-          <p className="text-lg opacity-90">{dept.description}</p>
+          <h1 className="text-5xl md:text-6xl font-bold mb-3 fade-in-up">{dept.name}</h1>
+          <p className="text-xl opacity-90 fade-in-up stagger-1">{dept.description}</p>
         </div>
       </section>
 
-      <section className="py-16 px-4 md:px-8 lg:px-12">
+      <section className="py-16 px-4 md:px-8 lg:px-12 bg-gradient-to-b from-background to-muted/20">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold mb-12 text-foreground">Our Products</h2>
-
-          {loading && <div>Loading products...</div>}
-          {error && <div className="text-red-600">{error}</div>}
-
-          <div className="mb-6">
-            <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search products..." className="w-full max-w-md px-3 py-2 rounded-md border border-border bg-background" />
+          <div className="flex items-center justify-between mb-12 fade-in-up">
+            <h2 className="text-4xl font-bold text-foreground">Our Products</h2>
+            {selectedProducts.length > 0 && (
+              <div className="px-4 py-2 bg-primary/10 rounded-full neu-card">
+                <span className="text-sm font-bold text-primary">
+                  {selectedProducts.length} selected
+                </span>
+              </div>
+            )}
           </div>
 
-          {categories.map((group) => {
+          {loading && (
+            <div className="text-center py-20">
+              <div className="inline-block w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+              <p className="mt-4 text-muted-foreground">Loading products...</p>
+            </div>
+          )}
+          
+          {error && (
+            <div className="text-center py-12 px-6 bg-destructive/10 rounded-xl neu-card">
+              <p className="text-destructive font-medium">{error}</p>
+            </div>
+          )}
+
+          <div className="mb-8 fade-in-up stagger-1">
+            <input 
+              value={query} 
+              onChange={(e) => setQuery(e.target.value)} 
+              placeholder="Search products..." 
+              className="w-full max-w-md px-5 py-3 rounded-xl border-0 bg-background neu-card focus:neu-hover transition-neu text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/20" 
+            />
+          </div>
+
+          {categories.map((group, groupIdx) => {
               const filtered = group.products.filter((p: any) => {
               const name = (p.name ?? p.product_name ?? p.post_title ?? '').toString().toLowerCase()
               const desc = (p.description ?? p.short_description ?? '').toString().toLowerCase()
@@ -192,8 +203,10 @@ export default function DepartmentClient({ deptId }: { deptId: number }) {
               const visible = showAll ? filtered : filtered.slice(0, 20)
 
               return (
-                <section key={group.name} className="mb-8">
-                  <h3 className="text-2xl font-semibold mb-4">{group.name}</h3>
+                <section key={group.name} className={`mb-12 fade-in-up stagger-${(groupIdx % 6) + 1}`}>
+                  <h3 className="text-3xl font-bold mb-6 text-foreground bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                    {group.name}
+                  </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {visible.map((p: any) => (
                       <div key={p.id ?? p.ID} onClick={() => handleProductSelect(Number(p.id ?? p.ID))}>
@@ -203,9 +216,12 @@ export default function DepartmentClient({ deptId }: { deptId: number }) {
                   </div>
 
                   {!showAll && filtered.length > 20 && (
-                    <div className="mt-4 text-center">
-                      <button className="text-sm text-primary underline" onClick={() => setExpandedGroups((s) => ({ ...s, [group.name]: true }))}>
-                        View more ({filtered.length - 20} more)
+                    <div className="mt-8 text-center">
+                      <button 
+                        className="px-6 py-3 rounded-xl bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20 text-primary font-bold neu-card hover:neu-hover transition-neu hover:scale-105"
+                        onClick={() => setExpandedGroups((s) => ({ ...s, [group.name]: true }))}
+                      >
+                        View {filtered.length - 20} more products →
                       </button>
                     </div>
                   )}
@@ -215,9 +231,13 @@ export default function DepartmentClient({ deptId }: { deptId: number }) {
 
             {/* Suggestions: pick up to 6 items from other groups */}
             {categories.length > 0 && (
-              <section className="mt-12">
-                <h3 className="text-2xl font-semibold mb-4">You might also be interested in</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <section className="mt-16 pt-16 border-t border-border">
+                <h3 className="text-3xl font-bold mb-8 text-center fade-in-up">
+                  <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                    You might also be interested in
+                  </span>
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {(() => {
                     const suggestions: any[] = []
                     for (const g of categories) {
@@ -230,8 +250,8 @@ export default function DepartmentClient({ deptId }: { deptId: number }) {
                       }
                       if (suggestions.length >= 6) break
                     }
-                    return suggestions.slice(0, 6).map((p: any) => (
-                      <div key={p.id ?? p.ID} onClick={() => handleProductSelect(Number(p.id ?? p.ID))}>
+                    return suggestions.slice(0, 6).map((p: any, idx: number) => (
+                      <div key={p.id ?? p.ID} onClick={() => handleProductSelect(Number(p.id ?? p.ID))} className={`fade-in-up stagger-${(idx % 6) + 1}`}>
                         <ProductCard product={{ id: Number(p.id ?? p.ID), name: p.name ?? p.product_name ?? p.post_title, description: p.description ?? p.short_description ?? p.description, image_url: p.image_url ?? p.image ?? p.guid ?? null, price: p.price }} selected={selectedProducts.includes(Number(p.id ?? p.ID))} onToggle={(id) => handleProductSelect(id)} />
                       </div>
                     ))
@@ -241,13 +261,20 @@ export default function DepartmentClient({ deptId }: { deptId: number }) {
             )}
 
             {selectedProducts.length > 0 && (
-            <div className="bg-muted/50 p-6 rounded-lg border border-border">
-              <p className="text-foreground mb-4">
-                <strong>{selectedProducts.length}</strong> product{selectedProducts.length !== 1 ? 's' : ''} selected
-              </p>
-              <Link href={`/interest?dept=${deptId}&products=${selectedProducts.join(',')}`}>
-                <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">Express Interest in Selected Products</Button>
-              </Link>
+            <div className="mt-12 bg-gradient-to-r from-primary/10 to-accent/10 p-8 rounded-2xl border border-primary/20 neu-card fade-in-up">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div>
+                  <p className="text-foreground mb-2 text-lg">
+                    <strong className="text-2xl text-primary">{selectedProducts.length}</strong> product{selectedProducts.length !== 1 ? 's' : ''} selected
+                  </p>
+                  <p className="text-sm text-muted-foreground">Ready to express interest in your selections</p>
+                </div>
+                <Link href={`/interest?dept=${deptId}&products=${selectedProducts.join(',')}`}>
+                  <Button className="bg-gradient-to-r from-primary to-accent text-white font-bold px-8 py-6 text-base neu-card hover:neu-hover transition-neu hover:scale-105">
+                    Express Interest in Selected Products →
+                  </Button>
+                </Link>
+              </div>
             </div>
           )}
         </div>

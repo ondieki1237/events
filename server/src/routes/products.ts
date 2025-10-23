@@ -1,5 +1,4 @@
 import express from 'express'
-import mysql from 'mysql2/promise'
 import dotenv from 'dotenv'
 import axios from 'axios'
 
@@ -7,100 +6,83 @@ dotenv.config()
 
 const router = express.Router()
 
-// Helper: fetch using WooCommerce REST API if keys provided
-async function fetchFromWoo() {
-  const consumer = process.env.WC_CONSUMER_KEY
-  const secret = process.env.WC_CONSUMER_SECRET
-  if (!consumer || !secret) return null
+const API_URL = process.env.SPDSK_ITEMS_API || 'https://accordmedical.co.ke/api/get_spdk_items.php'
+const IMAGE_BASE_URL = process.env.IMAGE_BASE_URL || 'https://accordmedical.co.ke/web/uploads/shop/'
 
-  // get categories
-  const catRes = await axios.get('https://accordmedical.co.ke/wp-json/wc/v3/products/categories', {
-    auth: { username: consumer, password: secret },
-  })
+async function fetchProductsFromAPI() {
+  try {
+    const response = await axios.get(API_URL)
 
-  const categories = catRes.data as any[]
-
-    const grouped: Array<{ id: number; name: string; products: any[] }> = []
-
-  // Fetch all products per category using pagination (per_page up to 100)
-  for (const cat of categories) {
-    const perPage = 100
-    let page = 1
-    const allProds: any[] = []
-
-    while (true) {
-      const prRes = await axios.get(
-        `https://accordmedical.co.ke/wp-json/wc/v3/products?category=${cat.id}&per_page=${perPage}&page=${page}`,
-        {
-          auth: { username: consumer, password: secret },
-        },
-      )
-
-      const pageItems = (prRes.data ?? []) as any[]
-      if (!pageItems || pageItems.length === 0) break
-
-      // normalize to `image_url`
-      const prods = pageItems.map((p: any) => ({
-        id: p.id,
-        name: p.name,
-        price: p.price,
-        image_url: p.images?.[0]?.src || null,
-        description: p.short_description || p.description || '',
-      }))
-
-      allProds.push(...prods)
-
-      // if we received less than perPage, it's the last page
-      if (pageItems.length < perPage) break
-      page += 1
+    if (response.status !== 200) {
+      throw new Error(`HTTP error! Status: ${response.status}`)
     }
 
-    grouped.push({ id: cat.id, name: cat.name, products: allProds })
-  }
+    const apiData = response.data
 
-  return grouped
+    if (apiData.status !== 'success') {
+      throw new Error(`API returned error: ${apiData.message || 'Unknown error'}`)
+    }
+
+    // Process products: images already have full URLs from the API
+    const products = (apiData.data || []).map((product: any) => {
+      const images = (product.images || []).map((img: any) => ({
+        product_image: img.product_image || '',
+        product_image_md: img.product_image_md || '',
+      }))
+
+      return {
+        id: product.id,
+        name: product.product_name,
+        slug: product.product_slug,
+        type: product.product_type,
+        description: product.product_description || '',
+        price: product.product_price || '0.00',
+        reduced_price: product.product_reduced_price,
+        category: product.category || 'Uncategorized',
+        brand: product.item_brand_manufacturer,
+        images,
+        // Use the first image as primary image_url for frontend compatibility
+        image_url: images.length > 0 ? images[0].product_image : null,
+        featured: product.featured === 1 || product.featured === '1',
+      }
+    })
+
+    return products
+  } catch (err: any) {
+    console.error('Error fetching products from SPDSK API:', err.message)
+    throw err
+  }
 }
 
 router.get('/', async (req, res) => {
   try {
-    // Prefer WooCommerce API if credentials are present
-    const woo = await fetchFromWoo()
-    if (woo) return res.json({ data: woo })
+    const products = await fetchProductsFromAPI()
 
-    // Fallback to direct MySQL query
-    const connection = await mysql.createConnection({
-      host: process.env.DB_HOST,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-      port: Number(process.env.DB_PORT || 3306),
-    })
+    // Group products by category name
+    const grouped: Record<string, any[]> = {}
 
-    const limit = Number(process.env.DB_PRODUCT_LIMIT || 1000)
+    for (const product of products) {
+      const category = product.category || 'Uncategorized'
+      if (!grouped[category]) {
+        grouped[category] = []
+      }
+      grouped[category].push(product)
+    }
 
-    const [rows] = await connection.execute(`
-      SELECT 
-        p.ID,
-        p.post_title AS product_name,
-        MAX(CASE WHEN pm.meta_key = '_price' THEN pm.meta_value END) AS price,
-        MAX(CASE WHEN pm.meta_key = '_regular_price' THEN pm.meta_value END) AS regular_price,
-        MAX(CASE WHEN pm.meta_key = '_sale_price' THEN pm.meta_value END) AS sale_price,
-        im.guid AS image_url
-      FROM wpc2_posts p
-      LEFT JOIN wpc2_postmeta pm ON p.ID = pm.post_id
-      LEFT JOIN wpc2_postmeta pm2 ON p.ID = pm2.post_id AND pm2.meta_key = '_thumbnail_id'
-      LEFT JOIN wpc2_posts im ON im.ID = pm2.meta_value
-      WHERE p.post_type = 'product' AND p.post_status = 'publish'
-      GROUP BY p.ID
-      LIMIT ${limit};
-    `)
+    // Convert to array format expected by frontend
+    // Sort categories alphabetically for consistent ordering
+    const categoryArray = Object.keys(grouped)
+      .sort()
+      .map((categoryName, index) => ({
+        id: index + 1,
+        name: categoryName,
+        products: grouped[categoryName],
+      }))
 
-    await connection.end()
-
-    res.json({ data: rows })
-  } catch (err) {
+    res.json({ data: categoryArray })
+  } catch (err: any) {
     console.error('products fetch error', err)
-    res.status(500).json({ error: 'Failed to fetch products' })
+    res.status(500).json({ error: 'Failed to fetch products', message: err.message })
   }
 })
 
