@@ -20,22 +20,42 @@ async function fetchFromWoo() {
 
   const categories = catRes.data as any[]
 
-  const grouped: Array<{ id: number; name: string; products: any[] }> = []
+    const grouped: Array<{ id: number; name: string; products: any[] }> = []
 
+  // Fetch all products per category using pagination (per_page up to 100)
   for (const cat of categories) {
-    const prRes = await axios.get(`https://accordmedical.co.ke/wp-json/wc/v3/products?category=${cat.id}&per_page=100`, {
-      auth: { username: consumer, password: secret },
-    })
+    const perPage = 100
+    let page = 1
+    const allProds: any[] = []
 
-    const prods = (prRes.data ?? []).map((p: any) => ({
-      id: p.id,
-      name: p.name,
-      price: p.price,
-      image: p.images?.[0]?.src,
-      description: p.short_description || p.description || '',
-    }))
+    while (true) {
+      const prRes = await axios.get(
+        `https://accordmedical.co.ke/wp-json/wc/v3/products?category=${cat.id}&per_page=${perPage}&page=${page}`,
+        {
+          auth: { username: consumer, password: secret },
+        },
+      )
 
-    grouped.push({ id: cat.id, name: cat.name, products: prods })
+      const pageItems = (prRes.data ?? []) as any[]
+      if (!pageItems || pageItems.length === 0) break
+
+      // normalize to `image_url`
+      const prods = pageItems.map((p: any) => ({
+        id: p.id,
+        name: p.name,
+        price: p.price,
+        image_url: p.images?.[0]?.src || null,
+        description: p.short_description || p.description || '',
+      }))
+
+      allProds.push(...prods)
+
+      // if we received less than perPage, it's the last page
+      if (pageItems.length < perPage) break
+      page += 1
+    }
+
+    grouped.push({ id: cat.id, name: cat.name, products: allProds })
   }
 
   return grouped
@@ -56,6 +76,8 @@ router.get('/', async (req, res) => {
       port: Number(process.env.DB_PORT || 3306),
     })
 
+    const limit = Number(process.env.DB_PRODUCT_LIMIT || 1000)
+
     const [rows] = await connection.execute(`
       SELECT 
         p.ID,
@@ -70,7 +92,7 @@ router.get('/', async (req, res) => {
       LEFT JOIN wpc2_posts im ON im.ID = pm2.meta_value
       WHERE p.post_type = 'product' AND p.post_status = 'publish'
       GROUP BY p.ID
-      LIMIT 50;
+      LIMIT ${limit};
     `)
 
     await connection.end()

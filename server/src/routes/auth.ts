@@ -25,10 +25,15 @@ router.post('/login', async (req, res) => {
     return res.status(401).json({ error: 'Invalid credentials' })
   }
 
-  const secret = process.env.JWT_SECRET || 'change_this_secret'
+  const secret = (process.env.JWT_SECRET || 'change_this_secret') as jwt.Secret
   const expiresIn = process.env.JWT_EXPIRE || '7d'
 
-  const token = jwt.sign({ email }, secret, { expiresIn })
+  // jwt.SignOptions expects a number | string | undefined for expiresIn, but
+  // TypeScript's types can be strict depending on installed @types. Cast to any
+  // to keep this simple for the scaffold.
+  const opts: jwt.SignOptions = { expiresIn: expiresIn as any }
+
+  const token = jwt.sign({ email }, secret, opts)
 
   return res.json({ token })
 })
