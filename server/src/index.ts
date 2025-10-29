@@ -10,6 +10,7 @@ import interestsRoutes from './routes/interests'
 import feedbackRoutes from './routes/feedbacks'
 import statsRoutes from './routes/stats'
 import productsRoutes from './routes/products'
+import apiV1Routes from './routes/api-v1'
 
 dotenv.config({ path: './.env' })
 
@@ -47,8 +48,9 @@ app.use('/api/interests', interestsRoutes)
 app.use('/api/feedbacks', feedbackRoutes)
 app.use('/api/stats', statsRoutes)
 app.use('/api/products', productsRoutes)
+app.use('/api/v1', apiV1Routes) // New API v1 for external applications
 
-app.get('/', (req, res) => res.json({ ok: true, name: 'Events backend' }))
+app.get('/', (req, res) => res.json({ ok: true, name: 'Events backend', version: '1.0.0' }))
 
 async function start() {
   try {
