@@ -43,7 +43,7 @@ export default function JobsPage() {
       <main className="max-w-6xl mx-auto px-4 py-20">
         <div className="text-center mb-10">
           <h1 className="text-4xl font-bold">Careers at Accord Medical</h1>
-          <p className="text-muted-foreground mt-2">We post open roles here. Apply via the link or WhatsApp.</p>
+          <p className="text-muted-foreground mt-2">We post open roles here.</p>
         </div>
 
         <div className="p-6 bg-muted/10 rounded-2xl border border-border/30 hover:shadow-lg transition-all max-w-3xl mx-auto">
@@ -54,7 +54,6 @@ export default function JobsPage() {
 
           <div className="flex flex-col sm:flex-row gap-3 mt-6">
             <a href={JOB_URL} target="_blank" rel="noreferrer" className="inline-block bg-gradient-to-r from-primary to-accent text-white font-bold px-6 py-3 rounded-md text-center">View Job Listing</a>
-            <a href={whatsappHref} target="_blank" rel="noreferrer" className="inline-block border-2 border-primary text-primary px-6 py-3 rounded-md text-center">Apply via WhatsApp</a>
           </div>
         </div>
       </main>

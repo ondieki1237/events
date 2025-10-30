@@ -85,6 +85,7 @@ function GridViewProduct({ product, selected, onToggle, showCategory }: {
             fill
             className="object-cover transition-smooth group-hover:scale-110"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            loading="lazy"
           />
         ) : (
           <div className="flex items-center justify-center w-full h-full bg-gradient-to-br from-muted/80 to-muted/60">
@@ -185,6 +186,7 @@ function ListViewProduct({ product, selected, onToggle, showCategory }: {
               fill
               className="object-cover transition-smooth group-hover:scale-110"
               sizes="144px"
+              loading="lazy"
             />
           ) : (
             <div className="flex items-center justify-center w-full h-full bg-gradient-to-br from-muted/80 to-muted/60">
@@ -276,6 +278,7 @@ function CompactViewProduct({ product, selected, onToggle, showCategory }: {
               fill
               className="object-cover transition-smooth group-hover:scale-110"
               sizes="80px"
+              loading="lazy"
             />
           ) : (
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" className="opacity-40">
