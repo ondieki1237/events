@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
+import { FEATURED_PRODUCT_IDS } from "@/data/featured-products"
 import { 
   Microscope, 
   Baby, 
@@ -58,43 +59,20 @@ export default function Home() {
             <div className="space-y-4 fade-in-up">
               <div className="inline-block px-5 py-2 bg-gradient-to-r from-primary/10 to-accent/10 rounded-full border border-primary/20 neu-card">
                 <span className="text-sm font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  Leading Medical Equipment Suppliers in Kenya
+                  Welcome to Accord Medical Expo
                 </span>
               </div>
-              <h1 className="text-5xl md:text-7xl font-bold text-foreground leading-tight text-balance">
-                Medical Equipment & Laboratory Supplies in{' '}
+              <h1 className="text-6xl md:text-7xl font-bold text-foreground leading-tight text-balance">
+                Premium Medical Equipment{' '}
                 <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent gradient-animate">
-                  Nairobi, Kenya
+                  Solutions
                 </span>
               </h1>
             </div>
             <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed text-balance fade-in-up stagger-1">
-              Accord Medical Supplies Ltd - ISO certified supplier of medical equipment, fully automated chemistry analyzers, 
-              hospital furniture, diagnostic equipment & bulk medical supplies. Serving hospitals, laboratories, and clinics across Kenya and East Africa.
+              We are delighted to have you visit our booth at the Expo! Accord Medical is an accredited supplier of
+              quality medical, laboratory, and hospital equipment serving healthcare facilities across East Africa.
             </p>
-            
-            {/* SEO-optimized trust badges */}
-            <div className="flex flex-wrap justify-center gap-4 text-sm text-muted-foreground fade-in-up stagger-2">
-              <div className="flex items-center gap-2 bg-background/80 backdrop-blur-sm px-4 py-2 rounded-full border border-border/50">
-                <svg className="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
-                </svg>
-                <span className="font-semibold">ISO Certified</span>
-              </div>
-              <div className="flex items-center gap-2 bg-background/80 backdrop-blur-sm px-4 py-2 rounded-full border border-border/50">
-                <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                </svg>
-                <span className="font-semibold">Nairobi, Kenya</span>
-              </div>
-              <div className="flex items-center gap-2 bg-background/80 backdrop-blur-sm px-4 py-2 rounded-full border border-border/50">
-                <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-                </svg>
-                <span className="font-semibold">Bulk Orders Available</span>
-              </div>
-            </div>
 
             {/* Product Categories Grid - 6 per row, 2 rows */}
             <div className="pt-12 max-w-7xl mx-auto fade-in-up stagger-2">
@@ -149,7 +127,7 @@ export default function Home() {
 
       {/* Top Rated Products (most viewed/searched) */}
       <Suspense fallback={<div className="py-20 text-center text-muted-foreground">Loading top products...</div>}>
-        <TopRatedProducts />
+        <TopRatedProducts productIds={FEATURED_PRODUCT_IDS.length > 0 ? FEATURED_PRODUCT_IDS : undefined} />
       </Suspense>
 
       {/* CTA Section */}

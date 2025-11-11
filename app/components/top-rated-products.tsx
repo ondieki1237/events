@@ -9,66 +9,120 @@ type Product = {
   description?: string
   image_url?: string
   category?: string
+  views?: number
 }
 
-export default function TopRatedProducts({ count = 6 }: { count?: number }) {
+export default function TopRatedProducts({ count = 6, productIds }: { count?: number; productIds?: number[] }) {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
-  const apiBase = process.env.NEXT_PUBLIC_PRODUCTS_API || ''
+  const apiBase = process.env.NEXT_PUBLIC_PRODUCTS_API || 'https://events.codewithseth.co.ke/api/products'
 
   useEffect(() => {
     let mounted = true
     async function load() {
       setLoading(true)
+      console.log('TopRatedProducts: Starting to load products')
+      console.log('TopRatedProducts: productIds =', productIds)
+      console.log('TopRatedProducts: apiBase =', apiBase)
+      
       try {
-        // Try the products API and assume it supports ?sort=views or returns a list we can slice
-        const res = await fetch(apiBase + '?limit=500')
+        // Fetch all products from API
+        const res = await fetch(`${apiBase}`)
+        console.log('TopRatedProducts: API response status =', res.status)
+        
         if (!res.ok) throw new Error('products api failed')
         const json = await res.json()
-        const items = (json?.data ?? json) as any[]
+        console.log('TopRatedProducts: API data received, categories count =', json?.data?.length)
+        
+        // Extract all products from nested structure
+        let allProducts: any[] = []
+        if (json?.data && Array.isArray(json.data)) {
+          // API returns categories with nested products
+          json.data.forEach((category: any) => {
+            if (category.products && Array.isArray(category.products)) {
+              allProducts = allProducts.concat(category.products)
+            }
+          })
+        }
+        
+        console.log('TopRatedProducts: Total products extracted =', allProducts.length)
+        
         if (!mounted) return
 
-        // Small popularity algorithm: look for common view-like fields and compute a score
+        // If specific product IDs are provided, filter for those
+        if (productIds && productIds.length > 0) {
+          console.log('TopRatedProducts: Filtering for specific IDs:', productIds)
+          
+          const filteredProducts = allProducts
+            .filter(p => productIds.includes(Number(p.id)))
+            .map((p: any) => ({
+              id: Number(p.id || 0),
+              name: p.name || 'Untitled',
+              description: p.description || '',
+              image_url: p.image_url || p.images?.[0]?.product_image || '',
+              category: p.category || '',
+              views: Number(p.views || 0),
+            }))
+          
+          console.log('TopRatedProducts: Filtered products found =', filteredProducts.length)
+          console.log('TopRatedProducts: Filtered products =', filteredProducts.map(p => ({ id: p.id, name: p.name })))
+          
+          // Sort by the order of productIds
+          const sorted = productIds
+            .map(id => filteredProducts.find(p => p.id === id))
+            .filter(p => p !== undefined) as Product[]
+          
+          console.log('TopRatedProducts: Final sorted products =', sorted.length)
+          setProducts(sorted)
+          setLoading(false)
+          return
+        }
+
+        // Otherwise, sort by popularity
         function viewScore(p: any) {
-          const views = Number(p.views ?? p.viewCount ?? p.view_count ?? p.hits ?? p.popularity ?? p.searches ?? 0) || 0
+          const views = Number(p.views ?? p.viewCount ?? p.view_count ?? p.hits ?? p.popularity ?? 0) || 0
           const rating = Number(p.rating ?? p.avgRating ?? 0) || 0
-          // rating scaled to be comparable
           return views + rating * 10
         }
 
-        const mapped = items
-          .map((p) => ({
-            id: Number((p.id ?? p._id ?? p.productId) || 0),
-            name: p.name || p.title || 'Untitled',
-            description: p.description || p.excerpt || '',
-            image_url: p.image_url || p.image || p.imageUrl || p.thumbnail || '',
-            category: p.category || p.categoryName || '',
-            _raw: p,
-            _score: viewScore(p),
-          }))
+        const mapped = allProducts.map((p) => ({
+          id: Number(p.id || 0),
+          name: p.name || 'Untitled',
+          description: p.description || '',
+          image_url: p.image_url || p.images?.[0]?.product_image || '',
+          category: p.category || '',
+          views: Number(p.views || 0),
+          _raw: p,
+          _score: viewScore(p),
+        }))
 
-        // Sort by score desc, fallback to createdAt or id if equal
+        // Sort by score desc
         mapped.sort((a, b) => {
           if (b._score !== a._score) return b._score - a._score
-          const da = Number(a._raw?.createdAt ? new Date(a._raw.createdAt).getTime() : a.id)
-          const db = Number(b._raw?.createdAt ? new Date(b._raw.createdAt).getTime() : b.id)
-          return db - da
+          return b.id - a.id
         })
 
-        const top = mapped.slice(0, count).map((m) => ({ id: m.id, name: m.name, description: m.description, image_url: m.image_url, category: m.category }))
+        const top = mapped.slice(0, count).map((m) => ({ 
+          id: m.id, 
+          name: m.name, 
+          description: m.description, 
+          image_url: m.image_url, 
+          category: m.category,
+          views: m.views 
+        }))
+        
+        console.log('TopRatedProducts: Final products to display =', top.length)
         setProducts(top)
       } catch (e) {
-        console.warn('TopRatedProducts: failed to load products', e)
+        console.error('TopRatedProducts: Error loading products', e)
         setProducts([])
       } finally {
         if (mounted) setLoading(false)
       }
     }
-    if (apiBase) load()
+    load()
     return () => { mounted = false }
-  }, [apiBase, count])
-
-  if (!apiBase) return null
+  }, [apiBase, count, productIds])
 
   return (
     <section className="py-16 px-4 md:px-8 lg:px-12 bg-gradient-to-b from-background to-muted/30">
