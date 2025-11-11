@@ -24,20 +24,72 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  title: "Accord Medical Supplies Ltd - Medical Equipment & Supplies",
-  description: "Accord Medical Supplies Ltd — leading supplier of medical equipment, laboratory and hospital supplies in Kenya. Explore imaging, diagnostic, ICU, and surgical equipment.",
+  title: "Accord Medical Supplies Ltd - Medical Equipment Suppliers in Kenya | Nairobi",
+  description: "Leading medical equipment suppliers in Kenya. Accord Medical Supplies Ltd offers laboratory equipment, fully automated chemistry analyzers, hospital furniture, diagnostic equipment & medical supplies in Nairobi. ISO certified supplier with bulk medical supplies available.",
   keywords: [
-    'accord medical supplies ltd', 'accord medical supplies', 'medical equipment nairobi', 'medical supplies kenya', 'laboratory equipment', 'biochemistry analyzer', 'automated chemistry analyzer', 'medical equipment suppliers'
+    // High-intent branded searches
+    'accord medical supplies ltd', 
+    'accord medical supplies', 
+    'accord medical',
+    'accord healthcare kenya',
+    'accord healthcare kenya ltd',
+    // Location-based high-volume searches
+    'medical equipment suppliers in kenya',
+    'medical equipment suppliers in nairobi',
+    'medical supplies nairobi',
+    'medical supplies kenya',
+    'hospital equipment in nairobi',
+    'medical supplies nairobi cbd',
+    // Product-specific searches
+    'fully automated chemistry analyzer',
+    'fully automated chemistry analyzer price',
+    'biochemistry analyzer',
+    'automatic biochemistry analyzer',
+    'patient monitor',
+    'laboratory equipment kenya',
+    // Bulk & wholesale
+    'bulk medical supplies',
+    'bulk medical supplies near me',
+    'wholesale medical supplies kenya',
+    'medical supplies in bulk',
+    // General medical supplies
+    'medical equipment nairobi',
+    'medical equipment kenya',
+    'medical supplies',
+    'hospital equipment',
+    'laboratory equipment',
+    'diagnostic equipment'
   ],
   generator: "v0.app",
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'),
   openGraph: {
-    title: 'Accord Medical Supplies Ltd',
-    description: 'Quality medical equipment and supplies for hospitals, labs, and clinics in Kenya. Contact us for quotations and inquiries.',
+    title: 'Accord Medical Supplies Ltd - Top Medical Equipment Suppliers in Kenya',
+    description: 'ISO certified medical equipment supplier in Nairobi, Kenya. Fully automated chemistry analyzers, laboratory equipment, hospital furniture & diagnostic supplies. Bulk orders available. Contact: +254 729 115 000',
+    type: 'website',
+    locale: 'en_KE',
+    siteName: 'Accord Medical Supplies Ltd',
   },
-  robots: 'index, follow',
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Accord Medical Supplies Ltd - Medical Equipment Suppliers Kenya',
+    description: 'Leading supplier of medical equipment and laboratory supplies in Kenya',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
   alternates: {
     canonical: process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000',
+  },
+  verification: {
+    google: 'google78ebecd1320c8fbf',
   }
 }
 

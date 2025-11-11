@@ -1,4 +1,31 @@
+# robots.txt for Accord Medical Supplies Ltd
+
 User-agent: *
 Allow: /
+Allow: /department/
+Allow: /product/
+Allow: /blog/
+Allow: /fully-automated-chemistry-analyzer
+Allow: /medical-equipment-suppliers-nairobi
+Allow: /interest
+Allow: /feedback
+Allow: /jobs
 
-Sitemap: https://events.accordmedical.co.ke/sitemap.xml
+# Disallow admin and API routes
+Disallow: /admin
+Disallow: /api/
+
+Sitemap: https://events.codewithseth.co.ke/sitemap.xml
+
+# Crawl delay
+Crawl-delay: 1
+
+# Allow popular search engines
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Bingbot
+Allow: /

@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://events.accordmedical.co.ke'
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://events.codewithseth.co.ke'
   
   // Static pages
   const routes = [
@@ -12,11 +12,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/jobs',
     '/blog',
     '/products/top-rated',
+    '/fully-automated-chemistry-analyzer',
+    '/medical-equipment-suppliers-nairobi',
   ].map((route) => ({
     url: `${baseUrl}${route}`,
     lastModified: new Date(),
     changeFrequency: 'weekly' as const,
-    priority: route === '' ? 1 : 0.8,
+    priority: route === '' ? 1 : route.includes('chemistry-analyzer') || route.includes('nairobi') ? 0.9 : 0.8,
   }))
 
   // Department pages
@@ -24,7 +26,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: `${baseUrl}/department/${i + 1}`,
     lastModified: new Date(),
     changeFrequency: 'weekly' as const,
-    priority: 0.7,
+    priority: 0.8,
   }))
 
   return [...routes, ...departments]
