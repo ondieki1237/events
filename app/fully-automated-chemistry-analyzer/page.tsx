@@ -58,14 +58,15 @@ export default function ChemistryAnalyzerPage() {
                 <Button
                   size="lg"
                   className="bg-gradient-to-r from-primary to-accent text-white font-bold px-8 py-6 text-base hover:scale-105 transition-all"
-                  onClick={() => {
-                    const message = encodeURIComponent(
-                      "Hello! I'm interested in getting a quotation for Fully Automated Chemistry Analyzers. Please send me pricing and specifications."
-                    )
-                    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank')
-                  }}
+                  asChild
                 >
-                  Request Price Quote
+                  <a
+                    href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hello! I'm interested in getting a quotation for Fully Automated Chemistry Analyzers. Please send me pricing and specifications.")}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Request Price Quote
+                  </a>
                 </Button>
                 <Button
                   size="lg"
@@ -307,14 +308,15 @@ export default function ChemistryAnalyzerPage() {
             <Button
               size="lg"
               className="bg-white text-primary hover:bg-white/90 font-bold px-10 py-7 text-lg shadow-xl"
-              onClick={() => {
-                const message = encodeURIComponent(
-                  "Hello! I'm interested in getting a detailed quotation for Fully Automated Chemistry Analyzers including pricing, specifications, and installation details."
-                )
-                window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank')
-              }}
+              asChild
             >
-              Request Detailed Quote via WhatsApp
+              <a
+                href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hello! I'm interested in getting a detailed quotation for Fully Automated Chemistry Analyzers including pricing, specifications, and installation details.")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Request Detailed Quote via WhatsApp
+              </a>
             </Button>
             <Button
               size="lg"
