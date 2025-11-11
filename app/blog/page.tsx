@@ -23,11 +23,15 @@ async function getPosts(): Promise<Post[]> {
     return {
       slug: file.replace(/\.md$/, ''),
       title: data.title || file.replace(/\.md$/, ''),
-      date: data.date,
+      date: data.date ? String(data.date) : '',
       excerpt: data.excerpt,
     }
   })
-  posts.sort((a, b) => (b.date || '').localeCompare(a.date || ''))
+  posts.sort((a, b) => {
+    const dateA = a.date || ''
+    const dateB = b.date || ''
+    return String(dateB).localeCompare(String(dateA))
+  })
   return posts
 }
 
