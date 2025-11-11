@@ -52,14 +52,15 @@ export default function NairobiSuppliersPage() {
               <Button
                 size="lg"
                 className="bg-gradient-to-r from-primary to-accent text-white font-bold px-8 py-6"
-                onClick={() => {
-                  const message = encodeURIComponent(
-                    "Hello! I'm looking for medical equipment supplies in Nairobi. Please send me your catalog and pricing."
-                  )
-                  window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank')
-                }}
+                asChild
               >
-                Contact Us on WhatsApp
+                <a
+                  href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hello! I'm looking for medical equipment supplies in Nairobi. Please send me your catalog and pricing.")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Contact Us on WhatsApp
+                </a>
               </Button>
               <Button
                 size="lg"
@@ -198,14 +199,15 @@ export default function NairobiSuppliersPage() {
             <Button
               size="lg"
               className="bg-white text-primary hover:bg-white/90 font-bold px-10 py-7 text-lg"
-              onClick={() => {
-                const message = encodeURIComponent(
-                  "Hello! I need medical equipment supplies in Nairobi. Please send me information about your products and pricing."
-                )
-                window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank')
-              }}
+              asChild
             >
-              WhatsApp: +254 729 115 000
+              <a
+                href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hello! I need medical equipment supplies in Nairobi. Please send me information about your products and pricing.")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                WhatsApp: +254 729 115 000
+              </a>
             </Button>
             <Button
               size="lg"
