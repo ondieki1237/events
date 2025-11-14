@@ -1,0 +1,14 @@
+{
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "https://black-phi-tawny.vercel.app/offers",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "destination": "https://black-phi-tawny.vercel.app/:path*",
+      "permanent": true
+    }
+  ]
+}
