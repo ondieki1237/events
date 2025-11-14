@@ -8,48 +8,26 @@ import { Card } from "@/components/ui/card"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 import { FEATURED_PRODUCT_IDS } from "@/data/featured-products"
-import { 
-  Microscope, 
-  Baby, 
-  Stethoscope, 
-  ScanLine, 
-  Activity, 
-  Armchair, 
-  Droplets, 
-  Smile, 
-  Refrigerator, 
-  TestTube, 
-  Home as HomeIcon, 
-  "use client"
+import {
+  Microscope,
+  Baby,
+  Stethoscope,
+  ScanLine,
+  Activity,
+  Armchair,
+  Droplets,
+  Smile,
+  Refrigerator,
+  TestTube,
+  Home as HomeIcon,
+  BookOpen,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react"
 
-  import { useState, lazy, Suspense } from "react"
-  import Link from "next/link"
-  import Image from "next/image"
-  import { Button } from "@/components/ui/button"
-  import { Card } from "@/components/ui/card"
-  import Navbar from "@/components/navbar"
-  import Footer from "@/components/footer"
-  import { FEATURED_PRODUCT_IDS } from "@/data/featured-products"
-  import { 
-    Microscope, 
-    Baby, 
-    Stethoscope, 
-    ScanLine, 
-    Activity, 
-    Armchair, 
-    Droplets, 
-    Smile, 
-    Refrigerator, 
-    TestTube, 
-    Home as HomeIcon, 
-    BookOpen,
-    ChevronLeft,
-    ChevronRight
-  } from "lucide-react"
-
-  // Lazy load components that are below the fold
-  const OfficeMap = lazy(() => import("@/components/office-map"))
-  const TopRatedProducts = lazy(() => import('./components/top-rated-products'))
+// Lazy load components that are below the fold
+const OfficeMap = lazy(() => import("@/components/office-map"))
+const TopRatedProducts = lazy(() => import("./components/top-rated-products"))
 
   const departments = [
     { id: 1, name: "Laboratory Equipment", description: "Advanced diagnostic and testing equipment", icon: Microscope, color: "from-blue-50 to-blue-100" },
