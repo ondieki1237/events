@@ -1,9 +1,0 @@
-{
-  "redirects": [
-    {
-      "source": "/:path*",
-      "destination": "https://black-phi-tawny.vercel.app/:path*",
-      "permanent": true
-    }
-  ]
-}

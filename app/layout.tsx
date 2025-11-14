@@ -1,130 +1,97 @@
-import type React from "react"
-import type { Metadata, Viewport } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
-import { Analytics } from "@vercel/analytics/next"
-import "./globals.css"
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import "./globals.css";
+import { CartProvider } from "@/contexts/CartContext";
 
-const _geist = Geist({ 
+const geistSans = Geist({
+  variable: "--font-geist-sans",
   subsets: ["latin"],
-  display: 'swap',
-  preload: true,
-  variable: '--font-geist',
-})
-const _geistMono = Geist_Mono({ 
-  subsets: ["latin"],
-  display: 'swap',
-  preload: true,
-  variable: '--font-geist-mono',
-})
+});
 
-export const viewport: Viewport = {
-  width: 'device-width',
-  initialScale: 1,
-  maximumScale: 5,
-}
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
 
 export const metadata: Metadata = {
-  title: "Accord Medical Supplies Ltd - Medical Equipment Suppliers in Kenya | Nairobi",
-  description: "Leading medical equipment suppliers in Kenya. Accord Medical Supplies Ltd offers laboratory equipment, fully automated chemistry analyzers, hospital furniture, diagnostic equipment & medical supplies in Nairobi. ISO certified supplier with bulk medical supplies available.",
+  metadataBase: new URL('https://accordmedical.co.ke'),
+  title: "Accord Medical Supplies Ltd - Medical Equipment Suppliers in Nairobi Kenya | Hospital Equipment",
+  description: "Leading medical equipment suppliers in Kenya. Accord Medical Supplies Ltd offers hospital equipment, laboratory equipment, dental equipment, x-ray machines, medical supplies in Nairobi. Black November deals available.",
   keywords: [
-    // High-intent branded searches
-    'accord medical supplies ltd', 
-    'accord medical supplies', 
-    'accord medical',
-    'accord healthcare kenya',
-    'accord healthcare kenya ltd',
-    // Location-based high-volume searches
-    'medical equipment suppliers in kenya',
-    'medical equipment suppliers in nairobi',
-    'medical supplies nairobi',
-    'medical supplies kenya',
-    'hospital equipment in nairobi',
-    'medical supplies nairobi cbd',
-    // Product-specific searches
-    'fully automated chemistry analyzer',
-    'fully automated chemistry analyzer price',
-    'biochemistry analyzer',
-    'automatic biochemistry analyzer',
-    'patient monitor',
-    'laboratory equipment kenya',
-    // Bulk & wholesale
-    'bulk medical supplies',
-    'bulk medical supplies near me',
-    'wholesale medical supplies kenya',
-    'medical supplies in bulk',
-    // General medical supplies
-    'medical equipment nairobi',
-    'medical equipment kenya',
-    'medical supplies',
-    'hospital equipment',
-    'laboratory equipment',
-    'diagnostic equipment'
+    "accord medical supplies ltd",
+    "accord medical supplies",
+    "medical equipment suppliers in nairobi",
+    "hospital equipment in nairobi",
+    "medical supplies in nairobi",
+    "accord medical kenya",
+    "medical supplies in bulk",
+    "laboratory equipment kenya",
+    "dental equipment suppliers kenya",
+    "x ray machine price",
+    "c arm machine",
+    "blood gas analyzer",
+    "biochemistry analyzer",
+    "medical equipment suppliers in kenya",
+    "accord healthcare kenya",
   ],
-  generator: "v0.app",
-  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'),
-  openGraph: {
-    title: 'Accord Medical Supplies Ltd - Top Medical Equipment Suppliers in Kenya',
-    description: 'ISO certified medical equipment supplier in Nairobi, Kenya. Fully automated chemistry analyzers, laboratory equipment, hospital furniture & diagnostic supplies. Bulk orders available. Contact: +254 729 115 000',
-    type: 'website',
-    locale: 'en_KE',
-    siteName: 'Accord Medical Supplies Ltd',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Accord Medical Supplies Ltd - Medical Equipment Suppliers Kenya',
-    description: 'Leading supplier of medical equipment and laboratory supplies in Kenya',
-  },
+  authors: [{ name: "Accord Medical Supplies Ltd" }],
+  creator: "Accord Medical Supplies Ltd",
+  publisher: "Accord Medical Supplies Ltd",
   robots: {
     index: true,
     follow: true,
     googleBot: {
       index: true,
       follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
     },
   },
+  openGraph: {
+    type: "website",
+    locale: "en_KE",
+    url: "https://accordmedical.co.ke",
+    siteName: "Accord Medical Supplies Ltd",
+    title: "Accord Medical Supplies Ltd - Medical Equipment Suppliers in Nairobi Kenya",
+    description: "Leading medical equipment suppliers in Kenya. Hospital equipment, laboratory equipment, medical supplies in Nairobi. Black November deals.",
+    images: [
+      {
+        url: "/logoaccord.png",
+        width: 1200,
+        height: 630,
+        alt: "Accord Medical Supplies Ltd Logo",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Accord Medical Supplies Ltd - Medical Equipment Suppliers Kenya",
+    description: "Leading medical equipment suppliers in Nairobi Kenya. Hospital equipment, laboratory equipment, medical supplies.",
+    images: ["/logoaccord.png"],
+  },
   alternates: {
-    canonical: process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000',
+    canonical: "https://accordmedical.co.ke",
   },
   verification: {
-    google: 'google78ebecd1320c8fbf',
-  }
-}
+    google: "your-google-verification-code", // Add your actual verification code
+  },
+};
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${_geist.variable} ${_geistMono.variable}`}>
-      <head>
-        <link rel="dns-prefetch" href="https://events.codewithseth.co.ke" />
-        <link rel="preconnect" href="https://events.codewithseth.co.ke" crossOrigin="anonymous" />
-        <link rel="preconnect" href="https://va.vercel-scripts.com" crossOrigin="anonymous" />
-      </head>
-      <body className={`font-sans antialiased`}>
-        {/* Organization + WebSite JSON-LD for SEO */}
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "Organization",
-          "name": "Accord Medical Supplies Ltd",
-          "url": process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000',
-          "logo": process.env.NEXT_PUBLIC_BASE_URL ? `${process.env.NEXT_PUBLIC_BASE_URL}/accord_transparent_logo.png` : '/accord_transparent_logo.png',
-          "contactPoint": [{ "@type": "ContactPoint", "telephone": "+254729115000", "contactType": "customer service" }]
-        }) }} />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "WebSite",
-          "url": process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000',
-          "name": "Accord Medical Supplies Ltd",
-          "potentialAction": { "@type": "SearchAction", "target": `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/search?q={search_term_string}`, "query-input": "required name=search_term_string" }
-        }) }} />
-        {children}
-        <Analytics />
+    <html lang="en">
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        <CartProvider>
+          {children}
+        </CartProvider>
       </body>
     </html>
-  )
+  );
 }

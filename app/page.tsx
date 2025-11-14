@@ -2,11 +2,12 @@
 
 import { useState, lazy, Suspense } from "react"
 import Link from "next/link"
-import Image from "next/image"
+import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
+import BlackNovemberCarousel from "@/components/black-november-carousel"
 import { FEATURED_PRODUCT_IDS } from "@/data/featured-products"
 import {
   Microscope,
@@ -19,474 +20,389 @@ import {
   Smile,
   Refrigerator,
   TestTube,
-  Home as HomeIcon,
+  HomeIcon,
   BookOpen,
-  ChevronLeft,
-  ChevronRight,
+  Zap,
 } from "lucide-react"
 
 // Lazy load components that are below the fold
 const OfficeMap = lazy(() => import("@/components/office-map"))
 const TopRatedProducts = lazy(() => import("./components/top-rated-products"))
 
-  const departments = [
-    { id: 1, name: "Laboratory Equipment", description: "Advanced diagnostic and testing equipment", icon: Microscope, color: "from-blue-50 to-blue-100" },
-    { id: 2, name: "Maternity Equipment", description: "Comprehensive maternal and neonatal care solutions", icon: Baby, color: "from-pink-50 to-pink-100" },
-    { id: 3, name: "Diagnostic Products", description: "Essential diagnostic tools and supplies", icon: Stethoscope, color: "from-purple-50 to-purple-100" },
-    { id: 4, name: "Imaging Equipment", description: "Modern imaging and diagnostic technology", icon: ScanLine, color: "from-cyan-50 to-cyan-100" },
-    { id: 5, name: "Theatre & ICU Equipment", description: "Critical care and surgical equipment", icon: Activity, color: "from-red-50 to-red-100" },
-    { id: 6, name: "Hospital Furniture", description: "Quality healthcare furniture solutions", icon: Armchair, color: "from-green-50 to-green-100" },
-    { id: 7, name: "Renal Equipment", description: "Dialysis and kidney care equipment", icon: Droplets, color: "from-teal-50 to-teal-100" },
-    { id: 8, name: "Dental Equipment", description: "Complete dental care solutions", icon: Smile, color: "from-emerald-50 to-emerald-100" },
-    { id: 9, name: "Cold Chain", description: "Temperature-controlled storage solutions", icon: Refrigerator, color: "from-sky-50 to-sky-100" },
-    { id: 10, name: "CSSD", description: "Central Sterile Services Department equipment", icon: TestTube, color: "from-violet-50 to-violet-100" },
-    { id: 11, name: "Homecare Equipment", description: "Home healthcare and medical equipment", icon: HomeIcon, color: "from-amber-50 to-amber-100" },
-    { id: 12, name: "Medical Training Materials", description: "Educational tools and training equipment", icon: BookOpen, color: "from-orange-50 to-orange-100" },
-  ]
+// Floating discount badge component with pulsing animation
+function DiscountBadge() {
+  return (
+    <motion.div
+      role="status"
+      aria-label="Discount badge"
+      className="absolute top-4 right-4 bg-gradient-to-r from-red-600 to-red-700 text-white font-extrabold text-sm px-4 py-2 rounded-full shadow-2xl z-50 flex items-center justify-center gap-1 border-2 border-red-400"
+      initial={{ scale: 0, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ type: "spring", stiffness: 260, damping: 14 }}
+      whileHover={{ scale: 1.1 }}
+    >
+      <Zap size={16} className="animate-pulse" />
+      Upto -35
+    </motion.div>
+  )
+}
 
-  // Sample product data for carousel (replace with real images/IDs)
-  const carouselProducts = [
-    { id: 1, name: "Ultrasound Machine Pro", price: "KSh 1,200,000", discount: "25% OFF", image: "/api/placeholder/400/500" },
-    { id: 2, name: "Digital X-Ray System", price: "KSh 3,500,000", discount: "30% OFF", image: "/api/placeholder/400/500" },
-    { id: 3, name: "ICU Ventilator Elite", price: "KSh 2,800,000", discount: "20% OFF", image: "/api/placeholder/400/500" },
-    { id: 4, name: "Anesthesia Workstation", price: "KSh 1,900,000", discount: "35% OFF", image: "/api/placeholder/400/500" },
-  ]
+const departments = [
+  {
+    id: 1,
+    name: "Laboratory Equipment",
+    description: "Advanced diagnostic and testing equipment",
+    icon: Microscope,
+    color: "from-blue-50 to-blue-100",
+  },
+  {
+    id: 2,
+    name: "Maternity Equipment",
+    description: "Comprehensive maternal and neonatal care solutions",
+    icon: Baby,
+    color: "from-pink-50 to-pink-100",
+  },
+  {
+    id: 3,
+    name: "Diagnostic Products",
+    description: "Essential diagnostic tools and supplies",
+    icon: Stethoscope,
+    color: "from-purple-50 to-purple-100",
+  },
+  {
+    id: 4,
+    name: "Imaging Equipment",
+    description: "Modern imaging and diagnostic technology",
+    icon: ScanLine,
+    color: "from-cyan-50 to-cyan-100",
+  },
+  {
+    id: 5,
+    name: "Theatre & ICU Equipment",
+    description: "Critical care and surgical equipment",
+    icon: Activity,
+    color: "from-red-50 to-red-100",
+  },
+  {
+    id: 6,
+    name: "Hospital Furniture",
+    description: "Quality healthcare furniture solutions",
+    icon: Armchair,
+    color: "from-green-50 to-green-100",
+  },
+  {
+    id: 7,
+    name: "Renal Equipment",
+    description: "Dialysis and kidney care equipment",
+    icon: Droplets,
+    color: "from-teal-50 to-teal-100",
+  },
+  {
+    id: 8,
+    name: "Dental Equipment",
+    description: "Complete dental care solutions",
+    icon: Smile,
+    color: "from-emerald-50 to-emerald-100",
+  },
+  {
+    id: 9,
+    name: "Cold Chain",
+    description: "Temperature-controlled storage solutions",
+    icon: Refrigerator,
+    color: "from-sky-50 to-sky-100",
+  },
+  {
+    id: 10,
+    name: "CSSD",
+    description: "Central Sterile Services Department equipment",
+    icon: TestTube,
+    color: "from-violet-50 to-violet-100",
+  },
+  {
+    id: 11,
+    name: "Homecare Equipment",
+    description: "Home healthcare and medical equipment",
+    icon: HomeIcon,
+    color: "from-amber-50 to-amber-100",
+  },
+  {
+    id: 12,
+    name: "Medical Training Materials",
+    description: "Educational tools and training equipment",
+    icon: BookOpen,
+    color: "from-orange-50 to-orange-100",
+  },
+]
 
-  export default function Home() {
-    const [scrolled, setScrolled] = useState(false)
-    const [currentSlide, setCurrentSlide] = useState(0)
+function DepartmentCard({ dept, index }: { dept: typeof departments[0]; index: number }) {
+  const Icon = dept.icon
+  return (
+    <Link href="/products" className="block">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ delay: index * 0.05 }}
+        whileHover={{ y: -8, boxShadow: "0 20px 40px rgba(0,0,0,0.1)" }}
+        className="group relative"
+      >
+        <Card className="h-full overflow-hidden bg-gradient-to-br from-white to-gray-50 border-2 border-transparent hover:border-red-500 transition-all duration-300 p-4 sm:p-6 cursor-pointer">
+          <div className="absolute inset-0 bg-gradient-to-br from-red-500/0 to-red-600/0 group-hover:from-red-500/5 group-hover:to-red-600/5 transition-all duration-300" />
 
-    const nextSlide = () => {
-      setCurrentSlide((prev) => (prev + 1) % carouselProducts.length)
-    }
+          <div className="relative z-10">
+            <motion.div
+              whileHover={{ scale: 1.15, rotate: 5 }}
+              className="w-12 h-12 rounded-lg bg-gradient-to-br from-red-100 to-red-200 flex items-center justify-center mb-4 text-red-600"
+            >
+              <Icon size={24} />
+            </motion.div>
 
-    const prevSlide = () => {
-      setCurrentSlide((prev) => (prev - 1 + carouselProducts.length) % carouselProducts.length)
-    }
+            <h3 className="font-bold text-lg text-gray-900 mb-2 group-hover:text-red-600 transition-colors">
+              {dept.name}
+            </h3>
+            <p className="text-sm text-gray-600 mb-4 leading-relaxed">{dept.description}</p>
 
-    return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-
-        {/* BLACK NOVEMBER HERO SECTION - INLINE STYLED */}
-        <section style={{
-          position: 'relative',
-          padding: '120px 1rem 80px',
-          background: 'linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%)',
-          overflow: 'hidden',
-          color: '#ffffff',
-          minHeight: '80vh',
-          display: 'flex',
-          alignItems: 'center'
-        }}>
-          {/* Animated Background Elements */}
-          <div style={{
-            position: 'absolute',
-            top: '10%',
-            right: '5%',
-            width: '600px',
-            height: '600px',
-            background: 'radial-gradient(circle, #00aeef 0%, transparent 70%)',
-            borderRadius: '50%',
-            opacity: 0.15,
-            animation: 'pulse 4s infinite'
-          }} />
-          <div style={{
-            position: 'absolute',
-            bottom: '10%',
-            left: '5%',
-            width: '500px',
-            height: '500px',
-            background: 'radial-gradient(circle, #ff0000 0%, transparent 70%)',
-            borderRadius: '50%',
-            opacity: 0.15,
-            animation: 'pulse 5s infinite reverse'
-          }} />
-
-          <style jsx>{`
-            @keyframes pulse {
-              0%, 100% { transform: scale(1); opacity: 0.15; }
-              50% { transform: scale(1.2); opacity: 0.25; }
-            }
-          `}</style>
-
-          <div style={{
-            maxWidth: '1400px',
-            margin: '0 auto',
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: '3rem',
-            alignItems: 'center',
-            position: 'relative',
-            zIndex: 10
-          }}>
-            {/* Left Side - Text Content */}
-            <div style={{ padding: '2rem 0' }}>
-              <div style={{
-                display: 'inline-block',
-                padding: '8px 24px',
-                background: 'linear-gradient(45deg, #ff0000, #cc0000)',
-                borderRadius: '50px',
-                marginBottom: '1.5rem',
-                fontSize: '14px',
-                fontWeight: 'bold',
-                letterSpacing: '1px',
-                textTransform: 'uppercase'
-              }}>
-                Black November Sale
-              </div>
-
-              <h1 style={{
-                fontSize: '4.5rem',
-                fontWeight: '900',
-                lineHeight: '1.1',
-                margin: '0 0 1.5rem',
-                background: 'linear-gradient(to right, #ffffff, #00aeef, #ffffff)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text'
-              }}>
-                UP TO<br />
-                <span style={{
-                  background: 'linear-gradient(to right, #ff0000, #ff3333)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text'
-                }}>70% OFF</span><br />
-                MEDICAL EQUIPMENT
-              </h1>
-
-              <p style={{
-                fontSize: '1.25rem',
-                color: '#cccccc',
-                marginBottom: '2rem',
-                maxWidth: '500px',
-                lineHeight: '1.6'
-              }}>
-                Exclusive Black November deals on premium medical, laboratory, and hospital equipment. Limited time only!
-              </p>
-
-              <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                <button style={{
-                  padding: '16px 32px',
-                  background: '#ff0000',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '50px',
-                  fontWeight: 'bold',
-                  fontSize: '1.1rem',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s',
-                  boxShadow: '0 8px 20px rgba(255, 0, 0, 0.3)'
-                }}
-                onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-3px)'}
-                onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-                onClick={() => document.getElementById("departments")?.scrollIntoView({ behavior: "smooth" })}
-                >
-                  Shop Now
-                </button>
-
-                <button style={{
-                  padding: '16px 32px',
-                  background: 'transparent',
-                  color: '#00aeef',
-                  border: '2px solid #00aeef',
-                  borderRadius: '50px',
-                  fontWeight: 'bold',
-                  fontSize: '1.1rem',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s'
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.background = '#00aeef'
-                  e.currentTarget.style.color = 'white'
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.background = 'transparent'
-                  e.currentTarget.style.color = '#00aeef'
-                }}
-                onClick={() => {
-                  const link = document.createElement("a")
-                  link.href = "/interest"
-                  link.click()
-                }}
-                >
-                  Express Interest
-                </button>
-              </div>
-
-              {/* Countdown Timer */}
-              <div style={{
-                marginTop: '2.5rem',
-                padding: '1.5rem',
-                background: 'rgba(255, 255, 255, 0.05)',
-                borderRadius: '16px',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                display: 'inline-block'
-              }}>
-                <p style={{ fontSize: '14px', color: '#00aeef', marginBottom: '8px', fontWeight: 'bold' }}>Sale Ends In</p>
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                  {['23', '15', '42', '18'].map((time, i) => (
-                    <div key={i} style={{ textAlign: 'center' }}>
-                      <div style={{
-                        background: '#ff0000',
-                        color: 'white',
-                        width: '60px',
-                        height: '60px',
-                        borderRadius: '12px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '1.5rem',
-                        fontWeight: 'bold'
-                      }}>
-                        {time}
-                      </div>
-                      <p style={{ fontSize: '12px', marginTop: '4px', color: '#888' }}>
-                        {['Hours', 'Minutes', 'Seconds', ''][i]}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Right Side - Product Carousel */}
-            <div style={{
-              position: 'relative',
-              height: '500px',
-              overflow: 'hidden',
-              borderRadius: '20px',
-              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.5)'
-            }}>
-              <div style={{
-                display: 'flex',
-                transition: 'transform 0.5s ease',
-                transform: `translateX(-${currentSlide * 100}%)`,
-                height: '100%'
-              }}>
-                {carouselProducts.map((product) => (
-                  <div key={product.id} style={{
-                    minWidth: '100%',
-                    height: '100%',
-                    position: 'relative',
-                    background: '#111'
-                  }}>
-                    <div style={{
-                      position: 'absolute',
-                      top: '20px',
-                      right: '20px',
-                      background: '#ff0000',
-                      color: 'white',
-                      padding: '8px 16px',
-                      borderRadius: '50px',
-                      fontSize: '14px',
-                      fontWeight: 'bold',
-                      zIndex: 10,
-                      transform: 'rotate(12deg)'
-                    }}>
-                      {product.discount}
-                    </div>
-
-                    <div style={{
-                      width: '100%',
-                      height: '60%',
-                      background: '#222',
-                      position: 'relative'
-                    }}>
-                      <div style={{
-                        position: 'absolute',
-                        inset: 0,
-                        background: `url(${product.image}) center/cover no-repeat`,
-                        backgroundColor: '#333'
-                      }} />
-                    </div>
-
-                    <div style={{
-                      padding: '1.5rem',
-                      background: '#111',
-                      height: '40%'
-                    }}>
-                      <h3 style={{
-                        fontSize: '1.5rem',
-                        fontWeight: 'bold',
-                        margin: '0 0 0.5rem',
-                        color: '#ffffff'
-                      }}>
-                        {product.name}
-                      </h3>
-                      <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '1rem',
-                        marginBottom: '1rem'
-                      }}>
-                        <span style={{
-                          fontSize: '1.8rem',
-                          fontWeight: 'bold',
-                          color: '#00aeef'
-                        }}>
-                          {product.price}
-                        </span>
-                        <span style={{
-                          fontSize: '1.2rem',
-                          color: '#888',
-                          textDecoration: 'line-through'
-                        }}>
-                          KSh {(parseInt(product.price.replace(/[^0-9]/g, '')) * 1.4).toLocaleString()}
-                        </span>
-                      </div>
-                      <button style={{
-                        width: '100%',
-                        padding: '12px',
-                        background: '#00aeef',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '8px',
-                        fontWeight: 'bold',
-                        cursor: 'pointer'
-                      }}>
-                        Add to Cart
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Carousel Controls */}
-              <button
-                onClick={prevSlide}
-                style={{
-                  position: 'absolute',
-                  left: '16px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  width: '50px',
-                  height: '50px',
-                  background: 'rgba(0, 0, 0, 0.7)',
-                  border: 'none',
-                  borderRadius: '50%',
-                  color: 'white',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  zIndex: 10
-                }}
-              >
-                <ChevronLeft size={24} />
-              </button>
-              <button
-                onClick={nextSlide}
-                style={{
-                  position: 'absolute',
-                  right: '16px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  width: '50px',
-                  height: '50px',
-                  background: 'rgba(0, 0, 0, 0.7)',
-                  border: 'none',
-                  borderRadius: '50%',
-                  color: 'white',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  zIndex: 10
-                }}
-              >
-                <ChevronRight size={24} />
-              </button>
-
-              {/* Dots */}
-              <div style={{
-                position: 'absolute',
-                bottom: '20px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                display: 'flex',
-                gap: '8px'
-              }}>
-                {carouselProducts.map((_, i) => (
-                  <div
-                    key={i}
-                    style={{
-                      width: i === currentSlide ? '24px' : '8px',
-                      height: '8px',
-                      borderRadius: '4px',
-                      background: i === currentSlide ? '#00aeef' : '#666',
-                      transition: 'all 0.3s'
-                    }}
-                  />
-                ))}
-              </div>
-            </div>
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileHover={{ opacity: 1 }}
+              className="flex items-center gap-2 text-red-600 font-semibold text-sm"
+            >
+              <span className="inline-block bg-red-100 px-2 py-1 rounded text-red-600 font-bold">Black November</span>
+              <span className="text-red-600">Shop Now →</span>
+            </motion.div>
           </div>
-        </section>
+        </Card>
+      </motion.div>
+    </Link>
+  )
+}
 
-        {/* Product Categories Grid - 6 per row, 2 rows */}
-        <div className="pt-12 max-w-7xl mx-auto px-4 md:px-8 lg:px-12 fade-in-up stagger-2">
-          <h2 className="text-2xl font-bold mb-6 text-foreground">Explore by category</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-            {departments.map((dept) => {
-              const IconComponent = dept.icon
-              return (
-                <Link 
-                  key={dept.id} 
-                  href={`/department/${dept.id}`}
-                  className="group"
-                >
-                  <div className="flex flex-col items-center justify-center w-32 h-32 rounded-2xl bg-background/80 backdrop-blur-sm border border-transparent transition-all duration-300 hover:border-[#008cf7] hover:shadow-lg cursor-pointer group-hover:scale-105">
-                    <div className="mb-3 text-foreground/70 group-hover:text-[#008cf7] transition-colors duration-300">
-                      <IconComponent size={40} strokeWidth={1.5} className="group-hover:scale-110 transition-transform duration-300" />
-                    </div>
-                    <span className="text-xs font-medium text-foreground/80 group-hover:text-foreground text-center leading-tight transition-colors duration-300">
-                      {dept.name}
-                    </span>
-                  </div>
-                </Link>
-              )
-            })}
+export default function Home() {
+  const [scrolled, setScrolled] = useState(false)
+
+  // Structured Data for SEO
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "MedicalBusiness",
+    "name": "Accord Medical Supplies Ltd",
+    "alternateName": "Accord Medical",
+    "description": "Leading medical equipment suppliers in Nairobi, Kenya. We supply hospital equipment, laboratory equipment, dental equipment, imaging equipment, and medical supplies in bulk.",
+    "url": "https://accordmedical.co.ke",
+    "logo": "https://accordmedical.co.ke/logoaccord.png",
+    "image": "https://accordmedical.co.ke/logoaccord.png",
+    "telephone": "+254729115000",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Nairobi",
+      "addressCountry": "KE"
+    },
+    "areaServed": {
+      "@type": "Country",
+      "name": "Kenya"
+    },
+    "hasOfferCatalog": {
+      "@type": "OfferCatalog",
+      "name": "Medical Equipment & Supplies",
+      "itemListElement": [
+        {
+          "@type": "OfferCatalog",
+          "name": "Laboratory Equipment",
+          "description": "Advanced diagnostic and testing equipment"
+        },
+        {
+          "@type": "OfferCatalog",
+          "name": "Hospital Equipment",
+          "description": "Hospital beds, operating tables, ICU equipment"
+        },
+        {
+          "@type": "OfferCatalog",
+          "name": "Dental Equipment",
+          "description": "Dental chairs, x-ray units, complete dental care solutions"
+        },
+        {
+          "@type": "OfferCatalog",
+          "name": "X-Ray Machines",
+          "description": "Digital x-ray machines, portable DR x-ray, C-arm x-ray machines"
+        },
+        {
+          "@type": "OfferCatalog",
+          "name": "Medical Analyzers",
+          "description": "Blood gas analyzer, biochemistry analyzer, fully automated chemistry analyzer"
+        }
+      ]
+    },
+    "priceRange": "$$",
+    "keywords": "medical equipment suppliers nairobi, hospital equipment kenya, medical supplies nairobi, laboratory equipment, dental equipment, x-ray machine, biochemistry analyzer"
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* SEO Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      
+      <Navbar />
+
+      {/* Hero section */}
+      <motion.section
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="relative pt-20 sm:pt-32 pb-20 sm:pb-40 px-4 md:px-8 lg:px-12 bg-gradient-to-br from-gray-950 via-gray-950 to-gray-950 overflow-hidden"
+      >
+        <div className="absolute top-20 right-10 w-72 h-72 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full blur-3xl opacity-60 animate-pulse" />
+        <div className="absolute bottom-20 left-10 w-96 h-96 bg-gradient-to-tr from-blue-400/10 to-blue-600/10 rounded-full blur-3xl opacity-60" />
+
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+            <div className="space-y-4 sm:space-y-6">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.1 }}
+                className="inline-block px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 rounded-full border-2 border-red-400 shadow-lg"
+              >
+                <span className="text-sm font-bold text-white flex items-center gap-2">
+                  <span className="inline-block w-2 h-2 bg-white rounded-full animate-pulse"></span>
+                  Black November • Exclusive Expo Offers
+                </span>
+              </motion.div>
+
+              <motion.h1
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white leading-tight"
+              >
+                <span className="block mb-2">Upgrade Your</span>
+                <span className="block mb-2">Healthcare Facility!</span>
+                <span className="bg-gradient-to-r from-red-500 via-red-600 to-orange-500 bg-clip-text text-transparent">
+                  Black November Awaits
+                </span>
+              </motion.h1>
+
+              <motion.p
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="text-lg sm:text-xl text-gray-300 max-w-2xl leading-relaxed"
+              >
+                <span className="font-semibold text-white">Premium Medical Equipment</span> at Unbeatable Prices
+                <br />
+                <span className="text-base text-gray-400 mt-2 block">
+                  Hospital Equipment • Laboratory Supplies • Dental Equipment • X-Ray Machines • Medical Supplies in Bulk
+                </span>
+              </motion.p>
+
+              <div className="flex gap-3 sm:gap-4 flex-wrap">
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Link href="/offers">
+                    <Button
+                      size="lg"
+                      className="bg-gradient-to-r from-red-600 to-red-700 text-white font-bold px-8 sm:px-10 py-4 sm:py-5 rounded-lg shadow-lg hover:shadow-red-600/50 hover:shadow-2xl transition-all duration-300 text-base sm:text-lg"
+                    >
+                      🔥 Explore Black November Deals
+                    </Button>
+                  </Link>
+                </motion.div>
+              </div>
+            </div>
+
+            <div className="relative hidden lg:block">
+              <DiscountBadge />
+              <BlackNovemberCarousel />
+            </div>
           </div>
         </div>
+      </motion.section>
 
-        {/* Top Rated Products (most viewed/searched) */}
-        <Suspense fallback={<div className="py-20 text-center text-muted-foreground">Loading top products...</div>}>
-          <TopRatedProducts productIds={FEATURED_PRODUCT_IDS.length > 0 ? FEATURED_PRODUCT_IDS : undefined} />
-        </Suspense>
+      {/* Top rated products */}
+      <Suspense fallback={<div className="py-20 text-center text-muted-foreground">Loading top products...</div>}>
+        <TopRatedProducts productIds={FEATURED_PRODUCT_IDS.length > 0 ? FEATURED_PRODUCT_IDS : undefined} />
+      </Suspense>
 
-        {/* CTA Section */}
-        <section className="py-24 px-4 md:px-8 lg:px-12 bg-gradient-to-r from-primary via-accent to-primary gradient-animate text-white relative overflow-hidden">
-          <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
-          <div className="max-w-4xl mx-auto text-center space-y-8 relative z-10">
-            <h2 className="text-5xl font-bold fade-in-up">Interested in Our Products?</h2>
-            <p className="text-xl opacity-90 max-w-2xl mx-auto leading-relaxed fade-in-up stagger-1">
-              Let us know what catches your interest and we'll follow up with you after the expo
+      {/* Departments Grid */}
+      <section id="departments" className="py-12 sm:py-20 px-4 md:px-8 lg:px-12 bg-gray-50">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            className="text-center mb-12 sm:mb-16"
+          >
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 mb-4">
+              Medical Equipment Suppliers in <span className="text-red-600">Nairobi Kenya</span>
+            </h2>
+            <p className="text-base sm:text-xl text-gray-600 max-w-3xl mx-auto px-2 mb-6">
+              Accord Medical Supplies Ltd is Kenya's leading supplier of hospital equipment, laboratory equipment, dental equipment, and medical supplies in bulk. We serve hospitals, clinics, and healthcare facilities across Nairobi and Kenya.
             </p>
-            <div className="fade-in-up stagger-2">
-              <Button
-                size="lg"
-                className="bg-white text-primary hover:bg-white/90 font-bold px-10 py-6 text-lg neu-card hover:neu-hover transition-neu hover:scale-105"
-                onClick={() => {
-                  const link = document.createElement("a")
-                  link.href = "/interest"
-                  link.click()
-                }}
-              >
-                Express Your Interest →
-              </Button>
-            </div>
+            <p className="text-sm sm:text-base text-gray-500 max-w-2xl mx-auto px-2">
+              Browse our comprehensive range of medical equipment including x-ray machines, C-arm machines, blood gas analyzers, biochemistry analyzers, and fully automated chemistry analyzers at competitive prices.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            {departments.map((dept, index) => (
+              <DepartmentCard key={dept.id} dept={dept} index={index} />
+            ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Office locations — shown only on the Home page */}
-        <Suspense fallback={<div className="py-20 text-center text-muted-foreground">Loading map...</div>}>
-          <OfficeMap />
-        </Suspense>
+      {/* Call to action */}
+      <section className="py-16 sm:py-24 px-4 md:px-8 lg:px-12 bg-gradient-to-r from-gray-950 via-blue-950 to-gray-950 text-white relative overflow-hidden">
+        <div className="absolute inset-0">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 20, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+            className="absolute top-1/2 right-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl"
+          />
+        </div>
 
-        <Footer />
-      </div>
-    )
-  }
+        <div className="max-w-4xl mx-auto text-center space-y-6 sm:space-y-8 relative z-10">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            className="text-3xl sm:text-5xl font-black"
+          >
+            Interested in Our <span className="text-red-500">Products?</span>
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="text-base sm:text-xl opacity-90 max-w-2xl mx-auto leading-relaxed px-2"
+          >
+            Let us know what catches your interest and we'll follow up with you after the expo.
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Button
+              size="lg"
+              className="bg-gradient-to-r from-white to-gray-100 text-red-600 hover:from-gray-50 hover:to-white font-bold px-6 sm:px-10 py-4 sm:py-6 text-base sm:text-lg transition-all duration-300 shadow-2xl hover:shadow-red-500/20"
+              onClick={() => {
+                const link = document.createElement("a")
+                link.href = "/interest"
+                link.click()
+              }}
+            >
+              Express Your Interest →
+            </Button>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Office locations */}
+      <Suspense fallback={<div className="py-20 text-center text-muted-foreground">Loading map...</div>}>
+        <OfficeMap />
+      </Suspense>
+
+      <Footer />
+    </div>
+  )
+}
