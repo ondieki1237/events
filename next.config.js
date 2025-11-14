@@ -7,12 +7,24 @@
 const nextConfig = {
   images: {
     // legacy domains whitelist (works with next/image)
-    domains: ['accordmedical.co.ke', 'events.codewithseth.co.ke'],
+    domains: ['accordmedical.co.ke', 'events.codewithseth.co.ke', 'events.accordmedical.co.ke'],
     // remotePatterns are more flexible and recommended for Next.js 13+
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'accordmedical.co.ke',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'events.accordmedical.co.ke',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'events.codewithseth.co.ke',
         port: '',
         pathname: '/**',
       },
