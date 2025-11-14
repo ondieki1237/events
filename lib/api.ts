@@ -1,4 +1,7 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5500"
+// Prefer environment override (NEXT_PUBLIC_API_URL). Default to the production
+// backend so local dev doesn't accidentally call localhost when the backend
+// isn't running.
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://events.codewithseth.co.ke"
 
 // Helper to handle API responses
 async function handleResponse(response: Response) {
